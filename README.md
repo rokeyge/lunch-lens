@@ -17,7 +17,7 @@ Week/Month view, selected week, and the vegetarian filter are stored only in the
 
 ## Menu data
 
-The website reads `src/data/current.json`. It contains the displayed month, source links, source-image hash, processing details, daily offerings, and one record for every weekday.
+The website reads `src/data/current.json`. It contains the displayed month, source links, source-image hash, processing details, daily offerings, and one record for every weekday. Original menu images are retained under `public/menu-sources/`, and automated month archives are written under `src/data/menus/`.
 
 Useful local checks:
 
@@ -37,11 +37,11 @@ The pipeline deliberately does not extract or infer allergens, ingredients, or n
 `.github/workflows/update-menu.yml` runs daily and can also be started manually. It:
 
 1. Finds the newest standard elementary menu post and full-size lunch image.
-2. Skips processing when the image hash has not changed.
+2. Archives the original image and skips LLM processing when its hash has not changed.
 3. Extracts strict JSON from the image.
 4. Checks every weekday and meal record structurally.
 5. Runs an independent image-versus-JSON review.
-6. Writes the current file plus a month archive only after approval.
+6. Writes the current file, month archive, and source image only after approval.
 7. Commits the data and starts the Pages deployment.
 
 Add the OpenAI API key as an Actions secret named `APIKEY` under **Repository settings → Secrets and variables → Actions → Secrets**. The workflow passes it to the updater without exposing it to the website. The default model is `gpt-5.5`; set an optional Actions variable named `OPENAI_MODEL` to override it.

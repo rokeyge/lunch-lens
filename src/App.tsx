@@ -10,6 +10,7 @@ type Menu = {
   title: string;
   sourcePageUrl: string;
   sourceImageUrl: string;
+  sourceImagePath: string;
   sourceSha256: string;
   checkedAt: string;
   automated: boolean;
@@ -243,7 +244,7 @@ export default function App() {
 
       <section className="safety-note">
         <p><strong>Allergies:</strong> This is an unofficial transcription, not allergy guidance. Ingredients and substitutions can change; contact your school or Child Nutrition Services.</p>
-        <a href={MENU.sourceImageUrl} target="_blank" rel="noreferrer">Original district menu <span aria-hidden="true">↗</span></a>
+        <a href={`${import.meta.env.BASE_URL}${MENU.sourceImagePath}`} target="_blank" rel="noreferrer">Original district menu <span aria-hidden="true">↗</span></a>
       </section>
 
       <footer>

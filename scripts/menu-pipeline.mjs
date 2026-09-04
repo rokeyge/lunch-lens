@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 export const MENU_PAGE_URL = "https://www.smfcsd.net/district-departments/business-services/child-nutrition-services/menu";
 const CURRENT_MENU_PATH = fileURLToPath(new URL("../src/data/current.json", import.meta.url));
 const ARCHIVE_DIRECTORY = fileURLToPath(new URL("../src/data/menus", import.meta.url));
+const SOURCE_DIRECTORY = fileURLToPath(new URL("../public/menu-sources", import.meta.url));
 const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 const MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
 
@@ -248,11 +249,34 @@ const review = (imageDataUrl, candidate) => callStructured({
 
 const readCurrent = async () => JSON.parse(await readFile(CURRENT_MENU_PATH, "utf8"));
 
+const sourceAsset = (source) => {
+  const extension = source.imageContentType.includes("png") ? "png" : source.imageContentType.includes("webp") ? "webp" : "jpg";
+  const relativePath = `menu-sources/${source.month}.${extension}`;
+  return { relativePath, filePath: `${SOURCE_DIRECTORY}/${source.month}.${extension}` };
+};
+
+const pathExists = async (path) => access(path).then(() => true, () => false);
+
+const writePublishedFiles = async (menu, imageBytes, imageFilePath) => {
+  const serialized = `${JSON.stringify(menu, null, 2)}\n`;
+  await mkdir(ARCHIVE_DIRECTORY, { recursive: true });
+  await mkdir(SOURCE_DIRECTORY, { recursive: true });
+  await writeFile(`${ARCHIVE_DIRECTORY}/${menu.month}.json`, serialized);
+  await writeFile(CURRENT_MENU_PATH, serialized);
+  await writeFile(imageFilePath, imageBytes);
+};
+
 export async function updateMenu() {
-  if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is required for menu extraction.");
   const source = await discoverSource();
   const current = await readCurrent();
+  const asset = sourceAsset(source);
   if (current.sourceSha256 === source.imageSha256 && process.env.FORCE_MENU_UPDATE !== "true") {
+    if (!(await pathExists(asset.filePath)) || current.sourceImagePath !== asset.relativePath) {
+      const archived = { ...current, sourceImagePath: asset.relativePath };
+      await writePublishedFiles(archived, source.imageBytes, asset.filePath);
+      console.log(`Archived unchanged source image at public/${asset.relativePath}.`);
+      return true;
+    }
     console.log(`No change: ${source.title} has the same image hash.`);
     return false;
   }
@@ -260,6 +284,7 @@ export async function updateMenu() {
     console.log(`No change: newest discovered menu ${source.month} is older than published menu ${current.month}.`);
     return false;
   }
+  if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is required when a new or forced menu extraction needs an LLM review.");
 
   const imageDataUrl = `data:${source.imageContentType};base64,${source.imageBytes.toString("base64")}`;
   let candidate = await extract(imageDataUrl, source.month);
@@ -286,6 +311,7 @@ export async function updateMenu() {
     title: candidate.title,
     sourcePageUrl: source.postUrl,
     sourceImageUrl: source.imageUrl,
+    sourceImagePath: asset.relativePath,
     sourceSha256: source.imageSha256,
     checkedAt,
     automated: true,
@@ -293,10 +319,7 @@ export async function updateMenu() {
     dailyNote: candidate.dailyNote,
     days: candidate.days.sort((a, b) => a.date.localeCompare(b.date))
   };
-  const serialized = `${JSON.stringify(published, null, 2)}\n`;
-  await mkdir(ARCHIVE_DIRECTORY, { recursive: true });
-  await writeFile(`${ARCHIVE_DIRECTORY}/${published.month}.json`, serialized);
-  await writeFile(CURRENT_MENU_PATH, serialized);
+  await writePublishedFiles(published, source.imageBytes, asset.filePath);
   console.log(`Published ${published.title} from ${source.imageUrl}`);
   return true;
 }
