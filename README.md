@@ -63,7 +63,7 @@ The pipeline deliberately does not extract or infer allergens, ingredients, or n
 5. When resolved, automatically closes the tracking issue.
 6. Commits verified menus, archives images, and triggers GitHub Pages deployment.
 
-Add your OpenAI API key as an Actions secret named `APIKEY` under **Repository settings → Secrets and variables → Actions → Secrets**.
+Add your Gemini API key (Google AI Studio) as an Actions secret named `LUNCH_KEY` under **Repository settings → Secrets and variables → Actions → Secrets** (an OpenAI key named `APIKEY` is also supported as a fallback).
 
 ## GitHub Pages
 

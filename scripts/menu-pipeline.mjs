@@ -7,7 +7,6 @@ const CURRENT_MENU_PATH = fileURLToPath(new URL("../src/data/current.json", impo
 const ARCHIVE_DIRECTORY = fileURLToPath(new URL("../src/data/menus", import.meta.url));
 const SOURCE_DIRECTORY = fileURLToPath(new URL("../public/menu-sources", import.meta.url));
 const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-const MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
 
 export const PROGRAMS = [
   {
@@ -253,22 +252,82 @@ export function validateMenu(menu, expectedMonth = menu.month) {
   return errors;
 }
 
-const outputText = (response) => {
-  for (const item of response.output || []) {
-    for (const content of item.content || []) if (content.type === "output_text") return content.text;
+const GEMINI_API_KEY = process.env.LUNCH_KEY || process.env.GEMINI_API_KEY;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
+const MODEL = GEMINI_API_KEY ? GEMINI_MODEL : OPENAI_MODEL;
+
+function toGeminiSchema(schema) {
+  if (!schema || typeof schema !== "object") return schema;
+  const converted = { ...schema };
+  if (typeof converted.type === "string") {
+    converted.type = converted.type.toUpperCase();
   }
-  throw new Error(`OpenAI response did not contain output text (status: ${response.status || "unknown"}).`);
+  if (converted.properties) {
+    converted.properties = Object.fromEntries(
+      Object.entries(converted.properties).map(([k, v]) => [k, toGeminiSchema(v)])
+    );
+  }
+  if (converted.items) {
+    converted.items = toGeminiSchema(converted.items);
+  }
+  delete converted.additionalProperties;
+  delete converted.pattern;
+  delete converted.minLength;
+  delete converted.maxLength;
+  return converted;
+}
+
+const callGemini = async ({ schema, instructions, prompt, imageBytes, imageContentType }) => {
+  const geminiSchema = toGeminiSchema(schema);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: {
+        parts: [{ text: instructions }]
+      },
+      contents: [
+        {
+          parts: [
+            {
+              inlineData: {
+                mimeType: imageContentType,
+                data: imageBytes.toString("base64")
+              }
+            },
+            { text: prompt }
+          ]
+        }
+      ],
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: geminiSchema,
+        temperature: 0.1
+      }
+    })
+  });
+  const body = await response.json();
+  if (!response.ok) {
+    throw new Error(`Gemini API error ${response.status}: ${body.error?.message || JSON.stringify(body)}`);
+  }
+  const text = body.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error(`Gemini response did not contain content text: ${JSON.stringify(body)}`);
+  return JSON.parse(text);
 };
 
-const callStructured = async ({ name, schema, instructions, prompt, imageDataUrl }) => {
+const callOpenAI = async ({ name, schema, instructions, prompt, imageBytes, imageContentType }) => {
+  const imageDataUrl = `data:${imageContentType};base64,${imageBytes.toString("base64")}`;
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
-      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      authorization: `Bearer ${OPENAI_API_KEY}`,
       "content-type": "application/json"
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: OPENAI_MODEL,
       store: false,
       instructions,
       input: [{
@@ -286,18 +345,30 @@ const callStructured = async ({ name, schema, instructions, prompt, imageDataUrl
   return JSON.parse(outputText(body));
 };
 
-const extract = (imageDataUrl, month, programName, correction = "") => callStructured({
+const callStructured = async (args) => {
+  if (GEMINI_API_KEY) {
+    return callGemini(args);
+  }
+  if (OPENAI_API_KEY) {
+    return callOpenAI(args);
+  }
+  throw new Error("LUNCH_KEY (Google AI Studio / Gemini) or OPENAI_API_KEY is required for menu extraction.");
+};
+
+const extract = ({ imageBytes, imageContentType, month, programName, correction = "" }) => callStructured({
   name: "school_lunch_menu",
   schema: extractionSchema,
-  imageDataUrl,
+  imageBytes,
+  imageContentType,
   instructions: "You transcribe school lunch calendar images exactly into structured data. Do not infer ingredients, nutrition, allergens, or dietary properties. Treat vegetarian status as true only when the image explicitly marks the choice as vegetarian through its stated legend, symbol, or color key.",
   prompt: `Transcribe the ${programName} menu for ${month}. Include every Monday–Friday date in the month. Mark closures as no-school with no choices. Preserve meal wording and punctuation. Put general daily offerings in dailyNote, not as dated choices.${correction}`
 });
 
-const review = (imageDataUrl, candidate, programName) => callStructured({
+const review = ({ imageBytes, imageContentType, candidate, programName }) => callStructured({
   name: "school_lunch_review",
   schema: reviewSchema,
-  imageDataUrl,
+  imageBytes,
+  imageContentType,
   instructions: "You are an independent transcription verifier. Compare the supplied JSON against the image character by character. Do not add or infer allergens, nutrition, ingredients, or dietary claims. Vegetarian is correct only when supported by the image's explicit legend, symbol, or color key.",
   prompt: `Review this proposed transcription for ${programName}. Approve only when every weekday, closure, meal choice, vegetarian marking, and daily note matches the image.\n\n${JSON.stringify(candidate, null, 2)}`
 });
@@ -339,22 +410,22 @@ export async function updateProgramMenu(programId, force = process.env.FORCE_MEN
     return false;
   }
 
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error(`OPENAI_API_KEY is required when a new or forced menu extraction needs an LLM review for ${programId}.`);
+  if (!GEMINI_API_KEY && !OPENAI_API_KEY) {
+    throw new Error(`LUNCH_KEY (Gemini) or OPENAI_API_KEY is required when a new or forced menu extraction needs an LLM review for ${programId}.`);
   }
 
-  const imageDataUrl = `data:${source.imageContentType};base64,${source.imageBytes.toString("base64")}`;
-  let candidate = await extract(imageDataUrl, source.month, program.name);
+  const { imageBytes, imageContentType } = source;
+  let candidate = await extract({ imageBytes, imageContentType, month: source.month, programName: program.name });
   let validationErrors = validateMenu(candidate, source.month);
   if (validationErrors.length) throw new Error(`[${programId}] Extraction failed validation:\n- ${validationErrors.join("\n- ")}`);
 
-  let verdict = await review(imageDataUrl, candidate, program.name);
+  let verdict = await review({ imageBytes, imageContentType, candidate, programName: program.name });
   if (!verdict.approved || verdict.discrepancies.length) {
     const correction = `\n\nA verifier found these possible errors in an earlier attempt. Re-read the image and produce a corrected full transcription:\n${JSON.stringify(verdict.discrepancies, null, 2)}`;
-    candidate = await extract(imageDataUrl, source.month, program.name, correction);
+    candidate = await extract({ imageBytes, imageContentType, month: source.month, programName: program.name, correction });
     validationErrors = validateMenu(candidate, source.month);
     if (validationErrors.length) throw new Error(`[${programId}] Corrected extraction failed validation:\n- ${validationErrors.join("\n- ")}`);
-    verdict = await review(imageDataUrl, candidate, program.name);
+    verdict = await review({ imageBytes, imageContentType, candidate, programName: program.name });
   }
   if (!verdict.approved || verdict.discrepancies.length) {
     throw new Error(`[${programId}] Independent review did not approve publication:\n${JSON.stringify(verdict, null, 2)}`);

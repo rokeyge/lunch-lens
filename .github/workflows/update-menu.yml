@@ -35,8 +35,9 @@ jobs:
       - name: Discover, extract, and verify menu
         id: pipeline
         env:
+          LUNCH_KEY: ${{ secrets.LUNCH_KEY }}
+          GEMINI_API_KEY: ${{ secrets.LUNCH_KEY }}
           OPENAI_API_KEY: ${{ secrets.APIKEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.5' }}
           FORCE_MENU_UPDATE: ${{ inputs.force && 'true' || 'false' }}
         run: npm run menu:update
 
