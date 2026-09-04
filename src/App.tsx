@@ -301,7 +301,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="freshness-bar-container">
+      <div className={`freshness-bar-container ${isFutureMonthUnavailable ? "is-warning" : "is-standard"}`}>
         {isFutureMonthUnavailable ? (
           <aside className="freshness-banner warning" role="status">
             <span>{formatMonth(currentMonthKey)} menu has not been processed yet</span>
@@ -361,9 +361,10 @@ export default function App() {
                 Today
               </button>
             )}
-            <label className="veg-toggle">
+            <label className="veg-toggle" aria-label="Filter vegetarian only">
               <input type="checkbox" checked={vegetarianOnly} onChange={(e) => changeVegetarian(e.target.checked)} />
-              <span>Vegetarian only</span>
+              <span className="veg-text-desktop">Vegetarian only</span>
+              <span className="veg-text-mobile">🌱 Veg</span>
             </label>
           </div>
         </div>

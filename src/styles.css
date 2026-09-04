@@ -295,6 +295,12 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
   height: 17px;
   accent-color: var(--green);
 }
+.veg-text-desktop {
+  display: inline;
+}
+.veg-text-mobile {
+  display: none;
+}
 
 .week-nav {
   width: min(100%, 360px);
@@ -592,11 +598,10 @@ footer {
 @media (max-width: 760px) {
   .topbar {
     height: auto;
-    min-height: 64px;
-    padding: 10px 16px;
+    padding: 8px 16px 10px;
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
   }
   .topbar-main {
     display: flex;
@@ -605,10 +610,16 @@ footer {
     width: 100%;
   }
   .brand {
-    font-size: 19px;
+    font-size: 18px;
+  }
+  .brand-mark {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    border-radius: 8px 8px 12px 8px;
   }
   .save-app-btn {
-    padding: 5px 10px;
+    padding: 4px 10px;
     font-size: 12px;
   }
   .school-selector-wrap {
@@ -617,104 +628,143 @@ footer {
   }
   .school-select {
     width: 100%;
-    font-size: 14px;
+    padding: 7px 12px;
+    font-size: 13.5px;
+    border-radius: 9px;
   }
 
-  .freshness-bar-container {
-    padding: 10px 16px 0;
-  }
-
+  /* Eliminate top clutter: hide bulky desktop hero & non-warning freshness metadata on mobile */
   .hero {
-    padding: 24px 16px 20px;
-    grid-template-columns: 1fr;
-    gap: 20px;
+    display: none;
   }
-  .hero h1 {
-    font-size: 44px;
+  .freshness-bar-container.is-standard {
+    display: none;
+  }
+  .freshness-bar-container.is-warning {
+    padding: 8px 16px 0;
   }
 
+  /* Compact content shell with zero wasted top padding */
   .content-shell {
-    padding: 0 16px 48px;
+    padding: 10px 16px 36px;
   }
 
+  /* Sleek, non-wrapping toolbar */
   .toolbar {
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
   }
+
+  /* iOS-style segmented control for Week / Month */
   .tabs {
-    gap: 18px;
+    gap: 2px;
+    background: var(--cream);
+    padding: 3px;
+    border-radius: 10px;
   }
   .tabs button {
-    font-size: 14px;
+    padding: 5px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 7px;
+    color: var(--muted);
+    transition: all 0.15s ease;
+  }
+  .tabs button.active {
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
 
   .toolbar-actions {
-    gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
-  /* Replace horizontal strip with 5 compact day tabs + expanded card */
+  .today-jump-btn {
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--green);
+  }
+
+  .veg-toggle {
+    padding: 5px 10px;
+    border: 1.5px solid var(--green);
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 700;
+    gap: 4px;
+    transition: all 0.15s ease;
+  }
+  .veg-toggle:has(input:checked) {
+    background: var(--green);
+    color: #fff;
+  }
+  .veg-toggle input {
+    display: none;
+  }
+  .veg-text-desktop {
+    display: none;
+  }
+  .veg-text-mobile {
+    display: inline;
+  }
+
+  /* Compact week navigation */
+  .week-nav {
+    width: 100%;
+    margin: 0 auto 8px;
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    gap: 8px;
+  }
+  .week-nav button {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    border-radius: 10px;
+  }
+  .week-label-wrap strong {
+    font-size: 15px;
+  }
+
+  /* Compact 5-day pill row */
   .desktop-week-row {
     display: none;
   }
-
   .mobile-week-container {
     display: block;
   }
-
   .mobile-day-tabs {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 6px;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
-
   .mobile-day-tab {
-    padding: 10px 4px 8px;
-    border: 1px solid var(--line);
+    padding: 8px 3px 6px;
     border-radius: 10px;
-    background: var(--paper);
-    color: var(--ink);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.15s ease;
   }
-
   .mobile-day-tab .day-name {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--muted);
+    font-size: 10.5px;
   }
-
   .mobile-day-tab .day-num {
-    font-family: Georgia, serif;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 16px;
   }
-
-  .mobile-day-tab.is-today .day-name {
-    color: var(--green);
-  }
-
-  .mobile-day-tab .today-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--green);
-    position: absolute;
-    bottom: 4px;
-  }
-
   .mobile-day-tab.is-closed {
     opacity: 0.7;
     background: #f4f0e6;
   }
-
   .mobile-day-tab.selected {
     background: var(--green);
     border-color: var(--green);
@@ -728,12 +778,23 @@ footer {
     background: white;
   }
 
+  /* Mobile expanded meal card */
   .mobile-expanded-card .meal-card {
     border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(19, 56, 50, 0.05);
   }
-
+  .mobile-expanded-card .meal-date {
+    min-height: 48px;
+    padding: 8px 14px;
+  }
+  .mobile-expanded-card .meal-date strong {
+    font-size: 20px;
+  }
   .mobile-expanded-card .choice {
-    padding: 14px 0;
+    padding: 12px 14px;
+  }
+  .mobile-expanded-card .choice h3 {
+    font-size: 15px;
   }
 
   .calendar {
@@ -764,6 +825,7 @@ footer {
   .daily-note {
     flex-direction: column;
     gap: 8px;
+    margin-top: 14px;
   }
 
   .safety-note {
