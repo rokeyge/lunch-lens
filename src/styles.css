@@ -12,9 +12,9 @@ button,a,select { -webkit-tap-highlight-color:transparent; }
 .hero { max-width:1180px; margin:0 auto; padding:54px 24px 38px; display:grid; grid-template-columns:1.4fr .75fr; gap:80px; align-items:end; }
 .eyebrow { margin:0 0 14px; color:var(--green); text-transform:uppercase; letter-spacing:.13em; font-size:12px; font-weight:800; }
 .hero h1 { margin:0; max-width:650px; font-family:Georgia,'Times New Roman',serif; font-size:clamp(52px,7vw,92px); line-height:.9; letter-spacing:-.055em; font-weight:500; }
-.school-picker { display:block; }
-.school-picker span { display:block; margin-bottom:9px; color:var(--muted); font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.11em; }
-.school-picker select { width:100%; padding:17px 46px 17px 17px; appearance:none; border:1px solid var(--ink); border-radius:12px; color:var(--ink); background:var(--paper) linear-gradient(45deg,transparent 50%,var(--ink) 50%) calc(100% - 20px) calc(50% - 2px)/6px 6px no-repeat; font-weight:700; }
+.menu-context { align-self:end; padding:14px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.menu-context span { display:block; margin-bottom:5px; color:var(--muted); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.11em; }
+.menu-context strong { color:var(--ink); font-size:15px; }
 .content-shell { max-width:1180px; margin:0 auto; padding:0 24px 72px; }
 .toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; border-bottom:1px solid var(--line); }
 .tabs { display:flex; gap:30px; }

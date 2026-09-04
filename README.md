@@ -1,6 +1,8 @@
 # Lunchbox SMFC
 
-An unofficial, readable view of the San Mateo–Foster City School District elementary lunch menu.
+An unofficial, readable view of the San Mateo–Foster City School District standard elementary lunch menu.
+
+Live site: https://rokeyge.github.io/lunch-lens/
 
 ## Local development
 
@@ -11,21 +13,45 @@ npm install
 npm run dev
 ```
 
-The school, Week/Month view, selected week, and vegetarian filter are stored only in the browser's local storage. There is no account or backend.
+Week/Month view, selected week, and the vegetarian filter are stored only in the browser's local storage. There is no account or application backend.
+
+## Menu data
+
+The website reads `src/data/current.json`. It contains the displayed month, source links, source-image hash, processing details, daily offerings, and one record for every weekday.
+
+Useful local checks:
+
+```bash
+npm run menu:discover
+npm run menu:validate
+npm test
+npm run build
+```
+
+`menu:discover` checks the live district page without calling an LLM. `menu:update` requires `OPENAI_API_KEY`; it calls the Responses API with the menu image, validates the structured transcription, has a second independent pass compare it with the image, and retries once with the review discrepancies before failing closed.
+
+The pipeline deliberately does not extract or infer allergens, ingredients, or nutrition. Vegetarian status is allowed only when the district image explicitly marks it through its legend, symbol, or color key.
+
+## Automatic monthly updates
+
+`.github/workflows/update-menu.yml` runs daily and can also be started manually. It:
+
+1. Finds the newest standard elementary menu post and full-size lunch image.
+2. Skips processing when the image hash has not changed.
+3. Extracts strict JSON from the image.
+4. Checks every weekday and meal record structurally.
+5. Runs an independent image-versus-JSON review.
+6. Writes the current file plus a month archive only after approval.
+7. Commits the data and starts the Pages deployment.
+
+Add the OpenAI API key as an Actions secret named `APIKEY` under **Repository settings → Secrets and variables → Actions → Secrets**. The workflow passes it to the updater without exposing it to the website. The default model is `gpt-5.5`; set an optional Actions variable named `OPENAI_MODEL` to override it.
 
 ## GitHub Pages
 
-The repository includes a GitHub Actions workflow that builds and publishes the static site whenever `main` is updated.
+`.github/workflows/pages.yml` builds and publishes the static site whenever a normal commit reaches `main`, or when the menu updater dispatches it after an automated commit.
 
-1. Push this directory to a GitHub repository using `main` as its default branch.
-2. Open **Settings → Pages** in that repository.
-3. Under **Build and deployment**, choose **GitHub Actions**.
-4. Push a change or run the **Deploy to GitHub Pages** workflow manually.
-
-Build the Pages artifact locally with:
+The production build is written to `dist/`:
 
 ```bash
 npm run build
 ```
-
-The output is written to `dist/`.

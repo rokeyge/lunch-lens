@@ -9,7 +9,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test",
+    "menu:discover": "node scripts/menu-pipeline.mjs discover",
+    "menu:validate": "node scripts/menu-pipeline.mjs validate",
+    "menu:update": "node scripts/menu-pipeline.mjs update"
   },
   "dependencies": {
     "react": "19.2.6",

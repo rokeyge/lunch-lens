@@ -1,0 +1,61 @@
+name: Update district menu
+
+on:
+  schedule:
+    - cron: "17 13 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Reprocess the current image even when its hash is unchanged
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: menu-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Discover, extract, and verify menu
+        env:
+          OPENAI_API_KEY: ${{ secrets.APIKEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.5' }}
+          FORCE_MENU_UPDATE: ${{ inputs.force && 'true' || 'false' }}
+        run: npm run menu:update
+      - name: Check for a published update
+        id: changes
+        shell: bash
+        run: |
+          if git diff --quiet -- src/data/current.json src/data/menus; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Commit verified menu
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/current.json src/data/menus
+          git commit -m "Update elementary lunch menu"
+          git push
+      - name: Deploy updated menu
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main
