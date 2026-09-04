@@ -9,9 +9,10 @@ interface InstallModalProps {
   isOpen: boolean;
   onClose: () => void;
   deferredPrompt: BeforeInstallPromptEvent | null;
+  isMobile: boolean;
 }
 
-export function InstallModal({ isOpen, onClose, deferredPrompt }: InstallModalProps) {
+export function InstallModal({ isOpen, onClose, deferredPrompt, isMobile }: InstallModalProps) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -26,6 +27,7 @@ export function InstallModal({ isOpen, onClose, deferredPrompt }: InstallModalPr
   if (!isOpen) return null;
 
   const isIOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isMac = typeof navigator !== "undefined" && /Macintosh|Mac OS X/.test(navigator.userAgent);
   const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   const handleInstallClick = async () => {
@@ -47,15 +49,15 @@ export function InstallModal({ isOpen, onClose, deferredPrompt }: InstallModalPr
           url: window.location.href,
         });
       } catch {
-        // User cancelled or share failed
+        // cancelled
       }
     } else {
       try {
         await navigator.clipboard.writeText(window.location.href);
         setCopied(true);
-        setTimeout(() => setCopied(false), 2500);
+        setTimeout(() => setCopied(false), 2000);
       } catch {
-        // clipboard unavailable
+        // unavailable
       }
     }
   };
@@ -76,7 +78,7 @@ export function InstallModal({ isOpen, onClose, deferredPrompt }: InstallModalPr
         <button
           className="modal-close-btn"
           onClick={onClose}
-          aria-label="Close add to home screen instructions"
+          aria-label="Close"
         >
           ✕
         </button>
@@ -88,14 +90,12 @@ export function InstallModal({ isOpen, onClose, deferredPrompt }: InstallModalPr
             className="install-icon-img"
           />
           <div>
-            <h2 id="install-modal-title">Add Lunchbox to Phone</h2>
-            <p className="install-subtitle">Fast 1-tap access with no App Store needed</p>
+            <h2 id="install-modal-title">
+              {isMobile ? "Add to Home Screen" : "Add to Desktop"}
+            </h2>
+            <p className="install-subtitle">Instant 1-tap lunch menu access</p>
           </div>
         </div>
-
-        <p className="install-benefit">
-          Save this page to your home screen to check daily school lunches without typing or searching. Your selected school stays saved!
-        </p>
 
         {deferredPrompt ? (
           <div className="install-prompt-action">
@@ -103,67 +103,77 @@ export function InstallModal({ isOpen, onClose, deferredPrompt }: InstallModalPr
               className="install-primary-btn"
               onClick={handleInstallClick}
             >
-              Install App on Phone
+              ⚡️ Install App Now
             </button>
-            <p className="install-note">Tapping install adds the Lunchbox app directly to your home screen.</p>
           </div>
         ) : isIOS ? (
-          <div className="install-steps">
-            <h3>How to save on iPhone & iPad:</h3>
-            <ol>
-              <li>
-                <span className="step-num">1</span>
-                <span>
-                  Tap the <strong>Share</strong> button{" "}
-                  <span className="step-glyph" title="Share icon">⎋</span>{" "}
-                  at the bottom of Safari.
-                </span>
-              </li>
-              <li>
-                <span className="step-num">2</span>
-                <span>
-                  Scroll down the menu and tap{" "}
-                  <strong>Add to Home Screen</strong>{" "}
-                  <span className="step-glyph" title="Plus icon">➕</span>.
-                </span>
-              </li>
-              <li>
-                <span className="step-num">3</span>
-                <span>
-                  Tap <strong>Add</strong> in the top-right corner.
-                </span>
-              </li>
-            </ol>
+          <div className="quick-guide-box">
+            <p className="quick-guide-intro">
+              Apple requires saving via Safari’s Share menu:
+            </p>
+            <div className="quick-steps-row">
+              <div className="quick-step-card">
+                <span className="quick-step-icon">⎋</span>
+                <strong>1. Tap Share</strong>
+                <small>Bottom toolbar</small>
+              </div>
+              <span className="quick-step-arrow">→</span>
+              <div className="quick-step-card">
+                <span className="quick-step-icon">➕</span>
+                <strong>2. Add to Home</strong>
+                <small>Scroll down menu</small>
+              </div>
+            </div>
+          </div>
+        ) : isMobile ? (
+          <div className="quick-guide-box">
+            <div className="quick-steps-row">
+              <div className="quick-step-card">
+                <span className="quick-step-icon">⋮</span>
+                <strong>1. Tap Menu</strong>
+                <small>Top-right dots</small>
+              </div>
+              <span className="quick-step-arrow">→</span>
+              <div className="quick-step-card">
+                <span className="quick-step-icon">📲</span>
+                <strong>2. Install App</strong>
+                <small>Add to Home screen</small>
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="install-steps">
-            <h3>How to save shortcut:</h3>
-            <ol>
-              <li>
-                <span className="step-num">1</span>
-                <span>
-                  Tap the browser menu{" "}
-                  <strong>⋮</strong> (three dots) in Chrome or your mobile browser.
-                </span>
-              </li>
-              <li>
-                <span className="step-num">2</span>
-                <span>
-                  Select <strong>Add to Home screen</strong> or <strong>Install app</strong>.
-                </span>
-              </li>
-            </ol>
+          <div className="quick-guide-box desktop">
+            {isMac ? (
+              <p>
+                In Mac Safari: Choose <strong>File</strong> in the top menu bar &gt; <strong>Add to Dock...</strong> to run Lunchbox as a desktop app.
+              </p>
+            ) : (
+              <p>
+                In Chrome or Edge: Click the <strong>Install icon (⊕)</strong> on the right side of the address bar.
+              </p>
+            )}
           </div>
         )}
 
         <div className="install-footer-actions">
-          <button
-            type="button"
-            className="share-btn"
-            onClick={handleShareClick}
-          >
-            {canShare ? "📲 Share with Spouse / Family" : copied ? "✓ Link Copied!" : "📋 Copy Link"}
-          </button>
+          {canShare && (
+            <button
+              type="button"
+              className="share-btn"
+              onClick={handleShareClick}
+            >
+              📲 Send Link to Spouse
+            </button>
+          )}
+          {!canShare && (
+            <button
+              type="button"
+              className="share-btn"
+              onClick={handleShareClick}
+            >
+              {copied ? "✓ Copied!" : "📋 Copy Link"}
+            </button>
+          )}
           <button
             type="button"
             className="dismiss-btn"

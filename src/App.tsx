@@ -102,11 +102,6 @@ export default function App() {
   const [view, setView] = useState<"week" | "month">("week");
   const [weekIndex, setWeekIndex] = useState(currentWeek);
   const [vegetarianOnly, setVegetarianOnly] = useState(false);
-
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showInstallModal, setShowInstallModal] = useState(false);
-
   const mealsByDate = useMemo(() => new Map(activeMenu.days.map((meal) => [meal.date, meal])), [activeMenu.days]);
 
   // Ensure weekIndex stays strictly within valid bounds if program week count changes
@@ -114,12 +109,23 @@ export default function App() {
     setWeekIndex((prev) => Math.max(0, Math.min(prev, weeks.length - 1)));
   }, [weeks.length]);
 
-  // Check standalone mode and capture Android install prompt
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showInstallModal, setShowInstallModal] = useState(false);
+
+  // Check standalone mode, mobile device, and capture install prompt
   useEffect(() => {
     const isStandaloneMode =
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as unknown as { standalone?: boolean }).standalone === true;
     setIsStandalone(isStandaloneMode);
+
+    const checkMobile = () => {
+      setIsMobile(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
 
     const handlePrompt = (e: Event) => {
       e.preventDefault();
@@ -127,7 +133,10 @@ export default function App() {
     };
 
     window.addEventListener("beforeinstallprompt", handlePrompt);
-    return () => window.removeEventListener("beforeinstallprompt", handlePrompt);
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("beforeinstallprompt", handlePrompt);
+    };
   }, []);
 
   const displayedWeek = weeks[weekIndex] || weeks[0];
@@ -272,10 +281,10 @@ export default function App() {
               type="button"
               className="save-app-btn"
               onClick={handleOpenInstall}
-              aria-label="Add Lunchbox shortcut to your phone home screen"
+              aria-label={isMobile ? "Add Lunchbox shortcut to your phone home screen" : "Add Lunchbox shortcut to your computer desktop"}
             >
-              <span aria-hidden="true" className="save-icon">📱</span>
-              <span className="save-label">Add to Phone</span>
+              <span aria-hidden="true" className="save-icon">{isMobile ? "📱" : "💻"}</span>
+              <span className="save-label">{isMobile ? "Add to Phone" : "Add to Desktop"}</span>
             </button>
           )}
         </div>
@@ -520,6 +529,7 @@ export default function App() {
         isOpen={showInstallModal}
         onClose={() => setShowInstallModal(false)}
         deferredPrompt={deferredPrompt}
+        isMobile={isMobile}
       />
     </main>
   );
