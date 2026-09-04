@@ -75,38 +75,41 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
   font-family: Georgia, serif;
 }
 
-.topbar-main {
+.install-banner-wrap {
+  max-width: 1132px;
+  margin: 12px auto 28px;
   display: flex;
-  align-items: center;
-  gap: 16px;
+  justify-content: center;
+  padding: 0 16px;
 }
 
 .save-app-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
+  gap: 8px;
+  padding: 9px 22px;
   background: var(--paper);
   color: var(--green);
   border: 1.5px solid var(--green);
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
-  box-shadow: 0 1px 4px rgba(27, 77, 62, 0.06);
+  box-shadow: 0 2px 8px rgba(27, 77, 62, 0.08);
 }
 .save-app-btn:hover {
   background: var(--green);
   color: #fff;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27, 77, 62, 0.16);
 }
 .save-app-btn:active {
   transform: translateY(0);
 }
 .save-icon {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .school-selector-wrap {
@@ -598,19 +601,16 @@ footer {
 @media (max-width: 760px) {
   .topbar {
     height: auto;
-    padding: 8px 16px 10px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-  .topbar-main {
+    padding: 10px 16px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     align-items: center;
-    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
   }
   .brand {
-    font-size: 18px;
+    font-size: 17.5px;
+    flex-shrink: 0;
   }
   .brand-mark {
     width: 28px;
@@ -618,19 +618,17 @@ footer {
     font-size: 14px;
     border-radius: 8px 8px 12px 8px;
   }
-  .save-app-btn {
-    padding: 4px 10px;
-    font-size: 12px;
-  }
   .school-selector-wrap {
-    max-width: 100%;
-    width: 100%;
+    flex: 1;
+    max-width: 220px;
+    min-width: 0;
   }
   .school-select {
     width: 100%;
-    padding: 7px 12px;
-    font-size: 13.5px;
-    border-radius: 9px;
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 8px;
+    text-overflow: ellipsis;
   }
 
   /* Eliminate top clutter: hide bulky desktop hero & non-warning freshness metadata on mobile */
@@ -836,6 +834,18 @@ footer {
     gap: 8px;
   }
 
+  .install-banner-wrap {
+    margin: 4px auto 20px;
+    padding: 0 16px;
+  }
+  .save-app-btn {
+    width: 100%;
+    max-width: 320px;
+    justify-content: center;
+    padding: 11px 18px;
+    font-size: 14px;
+  }
+
   footer {
     margin: 0 16px;
     padding-left: 0;
@@ -953,61 +963,96 @@ footer {
   margin: 8px 0 0;
 }
 
-.quick-guide-box {
-  background: var(--cream);
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 18px;
-}
-.quick-guide-intro {
-  font-size: 13px;
-  color: var(--muted);
-  margin: 0 0 12px;
-  text-align: center;
-}
-.quick-steps-row {
+.platform-selector-bar {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
 }
-.quick-step-card {
-  flex: 1;
+.platform-selector-bar label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.platform-select {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 8px;
+  outline: none;
+  cursor: pointer;
+}
+
+.install-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.install-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 12px 8px;
+  padding: 10px 14px;
+}
+.step-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.step-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 4px;
+  gap: 2px;
+  min-width: 0;
 }
-.quick-step-icon {
-  font-size: 24px;
+.step-title {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.step-title strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+.step-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--green);
   line-height: 1;
-  margin-bottom: 2px;
 }
-.quick-step-card strong {
-  font-size: 13px;
-  color: var(--ink);
+.step-icon-badge.check {
+  font-size: 15px;
+  font-weight: 900;
 }
-.quick-step-card small {
-  font-size: 11px;
+.step-desc {
+  font-size: 12px;
   color: var(--muted);
-}
-.quick-step-arrow {
-  font-size: 18px;
-  color: var(--green);
-  font-weight: 800;
-  opacity: 0.6;
-}
-.quick-guide-box.desktop p {
-  margin: 0;
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--ink);
 }
 
 .install-footer-actions {

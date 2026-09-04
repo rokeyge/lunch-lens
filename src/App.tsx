@@ -271,23 +271,10 @@ export default function App() {
   return (
     <main>
       <header className="topbar">
-        <div className="topbar-main">
-          <a className="brand" href="#top" aria-label="Lunchbox SMFC home">
-            <span className="brand-mark">L</span>
-            <span>Lunchbox <em>SMFC</em></span>
-          </a>
-          {!isStandalone && (
-            <button
-              type="button"
-              className="save-app-btn"
-              onClick={handleOpenInstall}
-              aria-label={isMobile ? "Add Lunchbox shortcut to your phone home screen" : "Add Lunchbox shortcut to your computer desktop"}
-            >
-              <span aria-hidden="true" className="save-icon">{isMobile ? "📱" : "💻"}</span>
-              <span className="save-label">{isMobile ? "Add to Phone" : "Add to Desktop"}</span>
-            </button>
-          )}
-        </div>
+        <a className="brand" href="#top" aria-label="Lunchbox SMFC home">
+          <span className="brand-mark">L</span>
+          <span>Lunchbox <em>SMFC</em></span>
+        </a>
         <div className="school-selector-wrap">
           <label htmlFor="school-select" className="visually-hidden">Select School</label>
           <select
@@ -519,6 +506,20 @@ export default function App() {
           Original district menu <span aria-hidden="true">↗</span>
         </a>
       </section>
+
+      {!isStandalone && (
+        <div className="install-banner-wrap">
+          <button
+            type="button"
+            className="save-app-btn bottom"
+            onClick={handleOpenInstall}
+            aria-label={isMobile ? "Add Lunchbox shortcut to your phone home screen" : "Add Lunchbox shortcut to your computer desktop"}
+          >
+            <span aria-hidden="true" className="save-icon">{isMobile ? "📱" : "💻"}</span>
+            <span className="save-label">{isMobile ? "Add Lunchbox to Phone" : "Add Lunchbox to Desktop"}</span>
+          </button>
+        </div>
+      )}
 
       <footer>
         <span>Transcribed from the SMFCSD {monthLabel} menu.</span>
