@@ -21,7 +21,7 @@
           "vegetarian": false
         },
         {
-          "name": "Bean, rice & cheese burrito (V)",
+          "name": "Bean, rice & cheese burrito",
           "vegetarian": true
         },
         {
@@ -43,7 +43,7 @@
           "vegetarian": false
         },
         {
-          "name": "NEW - Tofu in butter simmer sauce, rice & naan bread (V)",
+          "name": "NEW - Tofu in butter simmer sauce, rice & naan bread",
           "vegetarian": true
         },
         {
@@ -65,7 +65,7 @@
           "vegetarian": false
         },
         {
-          "name": "Veggie nuggets, French fries & crackers (V)",
+          "name": "Veggie nuggets, French fries & crackers",
           "vegetarian": true
         },
         {
@@ -83,7 +83,7 @@
       "status": "service",
       "choices": [
         {
-          "name": "Cheese pizza wedge (V)",
+          "name": "Cheese pizza wedge",
           "vegetarian": true
         },
         {
@@ -110,7 +110,7 @@
           "vegetarian": false
         },
         {
-          "name": "Cheese bites (V) w/ marinara sauce",
+          "name": "Cheese bites w/ marinara sauce",
           "vegetarian": true
         },
         {
@@ -128,7 +128,7 @@
           "vegetarian": false
         },
         {
-          "name": "Grilled cheese (V)",
+          "name": "Grilled cheese",
           "vegetarian": true
         },
         {
@@ -150,7 +150,7 @@
           "vegetarian": false
         },
         {
-          "name": "Cheese enchiladas in chile verde sauce (V)",
+          "name": "Cheese enchiladas in chile verde sauce",
           "vegetarian": true
         },
         {
@@ -164,7 +164,7 @@
       "status": "service",
       "choices": [
         {
-          "name": "Cheese pizza wedge (V)",
+          "name": "Cheese pizza wedge",
           "vegetarian": true
         },
         {
@@ -186,7 +186,7 @@
           "vegetarian": false
         },
         {
-          "name": "Veggie burger & fries (V)",
+          "name": "Veggie burger & fries",
           "vegetarian": true
         },
         {
@@ -200,7 +200,7 @@
       "status": "service",
       "choices": [
         {
-          "name": "Cheese breadsticks & marinara sauce (V)",
+          "name": "Cheese breadsticks & marinara sauce",
           "vegetarian": true
         },
         {
@@ -226,7 +226,7 @@
           "vegetarian": false
         },
         {
-          "name": "Vegetarian Florentine pasta (V)",
+          "name": "Vegetarian Florentine pasta",
           "vegetarian": true
         },
         {
@@ -248,7 +248,7 @@
           "vegetarian": false
         },
         {
-          "name": "Bean & cheese pupusa w/curtido (V)",
+          "name": "Bean & cheese pupusa w/curtido",
           "vegetarian": true
         },
         {
@@ -262,7 +262,7 @@
       "status": "service",
       "choices": [
         {
-          "name": "Cheese pizza wedge (V)",
+          "name": "Cheese pizza wedge",
           "vegetarian": true
         },
         {
@@ -289,7 +289,7 @@
           "vegetarian": false
         },
         {
-          "name": "NEW - Creamy tomato curry tortellini with garlic toast (V)",
+          "name": "NEW - Creamy tomato curry tortellini with garlic toast",
           "vegetarian": true
         },
         {
@@ -311,7 +311,7 @@
           "vegetarian": false
         },
         {
-          "name": "Bean & cheese quesadilla (V)",
+          "name": "Bean & cheese quesadilla",
           "vegetarian": true
         },
         {
@@ -333,7 +333,7 @@
       "status": "service",
       "choices": [
         {
-          "name": "Macaroni & cheese (V)",
+          "name": "Macaroni & cheese",
           "vegetarian": true
         },
         {
@@ -355,7 +355,7 @@
       "status": "service",
       "choices": [
         {
-          "name": "Cheese pizza wedge (V)",
+          "name": "Cheese pizza wedge",
           "vegetarian": true
         },
         {
@@ -377,7 +377,7 @@
           "vegetarian": false
         },
         {
-          "name": "Veggie burger & fries (V)",
+          "name": "Veggie burger & fries",
           "vegetarian": true
         },
         {
@@ -395,7 +395,7 @@
           "vegetarian": false
         },
         {
-          "name": "Bean, rice & cheese burrito (V)",
+          "name": "Bean, rice & cheese burrito",
           "vegetarian": true
         },
         {
@@ -413,7 +413,7 @@
           "vegetarian": false
         },
         {
-          "name": "Tofu in butter simmer sauce, rice & naan bread (V)",
+          "name": "Tofu in butter simmer sauce, rice & naan bread",
           "vegetarian": true
         },
         {

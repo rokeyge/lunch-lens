@@ -218,6 +218,10 @@ const expectedWeekdays = (month) => {
   return dates;
 };
 
+export const cleanMealName = (name) => {
+  return name.replace(/\s*\([vV]\)/g, "").replace(/\s{2,}/g, " ").trim();
+};
+
 export function validateMenu(menu, expectedMonth = menu.month) {
   const errors = [];
   if (!/^\d{4}-\d{2}$/.test(menu.month || "")) errors.push("month must use YYYY-MM");
@@ -445,7 +449,15 @@ export async function updateProgramMenu(programId, force = process.env.FORCE_MEN
     automated: true,
     model: MODEL,
     dailyNote: candidate.dailyNote,
-    days: candidate.days.sort((a, b) => a.date.localeCompare(b.date))
+    days: candidate.days
+      .map((day) => ({
+        ...day,
+        choices: (day.choices || []).map((choice) => ({
+          ...choice,
+          name: cleanMealName(choice.name)
+        }))
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date))
   };
 
   await mkdir(SOURCE_DIRECTORY, { recursive: true });

@@ -1,9 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import currentDataJson from "./data/current.json";
 import { SCHOOLS, DEFAULT_SCHOOL_ID, getSchool, School } from "./data/schools";
+import {
+  Choice,
+  MenuDay,
+  cleanMealName,
+  dateParts,
+  localDateKey,
+  buildWeeks,
+  formatMonth,
+  formatCheckedAt,
+  formatWeek,
+  isServiceDay,
+  getInitialDayForWeek,
+  getRelevantSchoolDate
+} from "./utils/menu-helpers";
 
-export type Choice = { name: string; vegetarian: boolean };
-export type MenuDay = { date: string; status: "service" | "no-school"; choices: Choice[] };
+export type { Choice, MenuDay };
+
 export type MenuProgram = {
   schemaVersion: number;
   menuType: string;
@@ -29,81 +43,6 @@ type CurrentData = {
 
 const currentData = currentDataJson as unknown as CurrentData;
 
-const dateParts = (date: string) => ({
-  weekday: new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`)),
-  day: Number(date.slice(-2)),
-});
-
-const localDateKey = () => {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-const addUtcDays = (date: Date, amount: number) => {
-  const result = new Date(date);
-  result.setUTCDate(result.getUTCDate() + amount);
-  return result;
-};
-
-const utcDateKey = (date: Date) => date.toISOString().slice(0, 10);
-
-const buildWeeks = (month: string) => {
-  const [year, monthNumber] = month.split("-").map(Number);
-  const first = new Date(Date.UTC(year, monthNumber - 1, 1));
-  const last = new Date(Date.UTC(year, monthNumber, 0));
-  const mondayOffset = (first.getUTCDay() + 6) % 7;
-  const firstMonday = addUtcDays(first, -mondayOffset);
-  const weeks: string[][] = [];
-
-  for (let monday = firstMonday; monday <= last; monday = addUtcDays(monday, 7)) {
-    weeks.push(Array.from({ length: 5 }, (_, index) => utcDateKey(addUtcDays(monday, index))));
-  }
-  return weeks;
-};
-
-const formatMonth = (month: string) => {
-  const [year, monthNumber] = month.split("-").map(Number);
-  return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric", timeZone: "UTC" })
-    .format(new Date(Date.UTC(year, monthNumber - 1, 1)));
-};
-
-const formatCheckedAt = (date: string) => new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  timeZone: "UTC",
-}).format(new Date(`${date.slice(0, 10)}T12:00:00Z`));
-
-const formatWeek = (dates: string[]) => {
-  const first = new Date(`${dates[0]}T12:00:00Z`);
-  const last = new Date(`${dates.at(-1)}T12:00:00Z`);
-  const firstLabel = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(first);
-  const lastLabel = new Intl.DateTimeFormat("en-US", { month: first.getUTCMonth() === last.getUTCMonth() ? undefined : "short", day: "numeric", timeZone: "UTC" }).format(last);
-  return `${firstLabel}–${lastLabel}`;
-};
-
-const isServiceDay = (dateStr: string, mealsMap: Map<string, MenuDay>) => {
-  const meal = mealsMap.get(dateStr);
-  return meal?.status === "service";
-};
-
-const getInitialDayForWeek = (weekDates: string[], todayStr: string, mealsMap: Map<string, MenuDay>) => {
-  if (weekDates.includes(todayStr)) {
-    if (isServiceDay(todayStr, mealsMap)) return todayStr;
-    const todayIndex = weekDates.indexOf(todayStr);
-    for (let i = todayIndex + 1; i < weekDates.length; i++) {
-      if (isServiceDay(weekDates[i], mealsMap)) return weekDates[i];
-    }
-    return todayStr;
-  }
-  for (const d of weekDates) {
-    if (isServiceDay(d, mealsMap)) return d;
-  }
-  return weekDates[0];
-};
-
 function MealCard({ meal, today, outsideMonth }: { meal?: MenuDay; today: boolean; outsideMonth: boolean }) {
   const date = meal?.date ?? "";
   const { weekday, day } = date ? dateParts(date) : { weekday: "", day: 0 };
@@ -124,17 +63,20 @@ function MealCard({ meal, today, outsideMonth }: { meal?: MenuDay; today: boolea
         <div className="no-school"><span>School’s out</span><small>No lunch service</small></div>
       ) : (
         <div className="choices">
-          {choices.map((choice, index) => (
-            <div className={`choice ${choice.vegetarian ? "veg-choice" : ""}`} key={choice.name}>
-              <span className="choice-number">{index + 1}</span>
-              <h3>
-                {choice.name}
-                {choice.vegetarian && (
-                  <a className="veg-icon" href="#vegetarian-note" aria-label="District-marked vegetarian choice">V</a>
-                )}
-              </h3>
-            </div>
-          ))}
+          {choices.map((choice, index) => {
+            const displayName = cleanMealName(choice.name);
+            return (
+              <div className={`choice ${choice.vegetarian ? "veg-choice" : ""}`} key={`${index}-${choice.name}`}>
+                <span className="choice-number">{index + 1}</span>
+                <h3>
+                  {displayName}
+                  {choice.vegetarian && (
+                    <a className="veg-icon" href="#vegetarian-note" aria-label="District-marked vegetarian choice">V</a>
+                  )}
+                </h3>
+              </div>
+            );
+          })}
         </div>
       )}
     </article>
@@ -143,6 +85,8 @@ function MealCard({ meal, today, outsideMonth }: { meal?: MenuDay; today: boolea
 
 export default function App() {
   const today = localDateKey();
+  const relevantSchoolDate = getRelevantSchoolDate(today);
+
   const [schoolId, setSchoolId] = useState(() => localStorage.getItem("lunchbox-school") || DEFAULT_SCHOOL_ID);
   const selectedSchool = useMemo(() => getSchool(schoolId), [schoolId]);
 
@@ -151,8 +95,8 @@ export default function App() {
   }, [selectedSchool.programId]);
 
   const weeks = useMemo(() => buildWeeks(activeMenu.month), [activeMenu.month]);
-  const matchingWeek = weeks.findIndex((week) => week.includes(today));
-  const currentWeek = matchingWeek >= 0 ? matchingWeek : today < `${activeMenu.month}-01` ? 0 : weeks.length - 1;
+  const matchingWeek = weeks.findIndex((week) => week.includes(relevantSchoolDate));
+  const currentWeek = matchingWeek >= 0 ? matchingWeek : relevantSchoolDate < `${activeMenu.month}-01` ? 0 : weeks.length - 1;
 
   const [view, setView] = useState<"week" | "month">("week");
   const [weekIndex, setWeekIndex] = useState(currentWeek);
@@ -160,10 +104,15 @@ export default function App() {
 
   const mealsByDate = useMemo(() => new Map(activeMenu.days.map((meal) => [meal.date, meal])), [activeMenu.days]);
 
+  // Ensure weekIndex stays strictly within valid bounds if program week count changes
+  useEffect(() => {
+    setWeekIndex((prev) => Math.max(0, Math.min(prev, weeks.length - 1)));
+  }, [weeks.length]);
+
   const displayedWeek = weeks[weekIndex] || weeks[0];
 
   const [selectedMobileDate, setSelectedMobileDate] = useState(() =>
-    getInitialDayForWeek(displayedWeek, today, mealsByDate)
+    getInitialDayForWeek(displayedWeek, relevantSchoolDate, mealsByDate)
   );
 
   useEffect(() => {
@@ -177,13 +126,23 @@ export default function App() {
   useEffect(() => {
     setSelectedMobileDate((prev) => {
       if (displayedWeek.includes(prev)) return prev;
-      return getInitialDayForWeek(displayedWeek, today, mealsByDate);
+      return getInitialDayForWeek(displayedWeek, relevantSchoolDate, mealsByDate);
     });
-  }, [displayedWeek, today, mealsByDate]);
+  }, [displayedWeek, relevantSchoolDate, mealsByDate]);
 
   const handleSchoolChange = (newSchoolId: string) => {
     setSchoolId(newSchoolId);
     localStorage.setItem("lunchbox-school", newSchoolId);
+    const newSchool = getSchool(newSchoolId);
+    const newMenu: MenuProgram = currentData.programs?.[newSchool.programId] ?? currentData;
+    const newWeeks = buildWeeks(newMenu.month);
+    if (newMenu.month !== activeMenu.month) {
+      const newMatching = newWeeks.findIndex((w) => w.includes(relevantSchoolDate));
+      const newCurrent = newMatching >= 0 ? newMatching : relevantSchoolDate < `${newMenu.month}-01` ? 0 : newWeeks.length - 1;
+      setWeekIndex(newCurrent);
+    } else {
+      setWeekIndex((prev) => Math.max(0, Math.min(prev, newWeeks.length - 1)));
+    }
   };
 
   const changeView = (value: "week" | "month") => {
@@ -199,7 +158,7 @@ export default function App() {
   const jumpToToday = () => {
     setWeekIndex(currentWeek);
     const targetWeek = weeks[currentWeek];
-    setSelectedMobileDate(getInitialDayForWeek(targetWeek, today, mealsByDate));
+    setSelectedMobileDate(getInitialDayForWeek(targetWeek, relevantSchoolDate, mealsByDate));
   };
 
   const isAwayFromToday = weekIndex !== currentWeek || (displayedWeek.includes(today) && selectedMobileDate !== today && isServiceDay(today, mealsByDate));
@@ -226,6 +185,46 @@ export default function App() {
     }
     return Array.from(groups.entries());
   }, []);
+
+  const viewOptions = ["week", "month"] as const;
+  const handleViewKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, currentOption: "week" | "month") => {
+    const currentIndex = viewOptions.indexOf(currentOption);
+    let targetIndex = -1;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      targetIndex = (currentIndex + 1) % viewOptions.length;
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      targetIndex = (currentIndex - 1 + viewOptions.length) % viewOptions.length;
+    } else if (e.key === "Home") {
+      targetIndex = 0;
+    } else if (e.key === "End") {
+      targetIndex = viewOptions.length - 1;
+    }
+    if (targetIndex >= 0) {
+      e.preventDefault();
+      const nextOption = viewOptions[targetIndex];
+      changeView(nextOption);
+      document.getElementById(`tab-range-${nextOption}`)?.focus();
+    }
+  };
+
+  const handleDayKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, currentIndex: number) => {
+    let targetIndex = -1;
+    if (e.key === "ArrowRight") {
+      targetIndex = (currentIndex + 1) % displayedWeek.length;
+    } else if (e.key === "ArrowLeft") {
+      targetIndex = (currentIndex - 1 + displayedWeek.length) % displayedWeek.length;
+    } else if (e.key === "Home") {
+      targetIndex = 0;
+    } else if (e.key === "End") {
+      targetIndex = displayedWeek.length - 1;
+    }
+    if (targetIndex >= 0) {
+      e.preventDefault();
+      const nextDate = displayedWeek[targetIndex];
+      setSelectedMobileDate(nextDate);
+      document.getElementById(`mobile-tab-${nextDate}`)?.focus();
+    }
+  };
 
   return (
     <main>
@@ -293,13 +292,17 @@ export default function App() {
       <section className="content-shell" aria-label="Lunch menu">
         <div className="toolbar">
           <div className="tabs" role="tablist" aria-label="Choose menu range">
-            {(["week", "month"] as const).map((option) => (
+            {viewOptions.map((option) => (
               <button
                 key={option}
+                id={`tab-range-${option}`}
                 role="tab"
                 aria-selected={view === option}
+                aria-controls={`panel-range-${option}`}
+                tabIndex={view === option ? 0 : -1}
                 className={view === option ? "active" : ""}
                 onClick={() => changeView(option)}
+                onKeyDown={(e) => handleViewKeyDown(e, option)}
               >
                 {option[0].toUpperCase() + option.slice(1)}
               </button>
@@ -320,7 +323,7 @@ export default function App() {
         </div>
 
         {view === "week" ? (
-          <>
+          <div id="panel-range-week" role="tabpanel" aria-labelledby="tab-range-week">
             <div className="week-nav">
               <button
                 aria-label="Previous week"
@@ -344,7 +347,7 @@ export default function App() {
             {/* Mobile Layout: Compact 5-day pill row + expanded card below */}
             <div className="mobile-week-container">
               <div className="mobile-day-tabs" role="tablist" aria-label="Select weekday">
-                {displayedWeek.map((date) => {
+                {displayedWeek.map((date, idx) => {
                   const { weekday, day } = dateParts(date);
                   const isToday = date === today;
                   const isSelected = date === selectedMobileDate;
@@ -354,11 +357,15 @@ export default function App() {
                   return (
                     <button
                       key={date}
+                      id={`mobile-tab-${date}`}
                       role="tab"
                       aria-selected={isSelected}
+                      aria-controls="mobile-day-panel"
+                      tabIndex={isSelected ? 0 : -1}
                       aria-label={`${weekday}, ${date}${isToday ? " (Today)" : ""}${isNoSchool ? " (No school)" : ""}`}
                       className={`mobile-day-tab ${isSelected ? "selected" : ""} ${isToday ? "is-today" : ""} ${isNoSchool ? "is-closed" : ""}`}
                       onClick={() => setSelectedMobileDate(date)}
+                      onKeyDown={(e) => handleDayKeyDown(e, idx)}
                     >
                       <span className="day-name">{weekday}</span>
                       <strong className="day-num">{day}</strong>
@@ -368,7 +375,7 @@ export default function App() {
                 })}
               </div>
 
-              <div className="mobile-expanded-card" role="tabpanel">
+              <div id="mobile-day-panel" className="mobile-expanded-card" role="tabpanel" aria-labelledby={`mobile-tab-${selectedMobileDate}`}>
                 <MealCard
                   meal={selectedMobileMealFiltered ?? { date: selectedMobileDate, status: "service", choices: [] }}
                   today={selectedMobileDate === today}
@@ -392,9 +399,15 @@ export default function App() {
                 );
               })}
             </div>
-          </>
+          </div>
         ) : (
-          <div className="calendar" aria-label={`${monthLabel} lunch calendar`} role="region">
+          <div
+            id="panel-range-month"
+            role="tabpanel"
+            aria-labelledby="tab-range-month"
+            className="calendar"
+            aria-label={`${monthLabel} lunch calendar`}
+          >
             {(["Mon", "Tue", "Wed", "Thu", "Fri"] as const).map((day) => (
               <div className="calendar-heading" key={day} aria-hidden="true">{day}</div>
             ))}
@@ -407,7 +420,7 @@ export default function App() {
                   className={`calendar-cell ${outside ? "outside" : ""} ${date === today ? "current" : ""}`}
                   key={date}
                   tabIndex={0}
-                  aria-label={`${date}: ${outside ? "outside menu month" : meal?.status === "no-school" ? "no school" : choices.map((c) => c.name).join(", ")}`}
+                  aria-label={`${date}: ${outside ? "outside menu month" : meal?.status === "no-school" ? "no school" : choices.map((c) => cleanMealName(c.name)).join(", ")}`}
                 >
                   <div className="calendar-date">
                     {dateParts(date).day}
@@ -418,14 +431,17 @@ export default function App() {
                   ) : meal?.status === "no-school" ? (
                     <strong className="calendar-closed">No school</strong>
                   ) : (
-                    choices.map((choice) => (
-                      <p className={choice.vegetarian ? "calendar-veg" : ""} key={choice.name}>
-                        {choice.name}
-                        {choice.vegetarian && (
-                          <a className="veg-icon" href="#vegetarian-note" aria-label="District-marked vegetarian choice">V</a>
-                        )}
-                      </p>
-                    ))
+                    choices.map((choice) => {
+                      const displayName = cleanMealName(choice.name);
+                      return (
+                        <p className={choice.vegetarian ? "calendar-veg" : ""} key={choice.name}>
+                          {displayName}
+                          {choice.vegetarian && (
+                            <a className="veg-icon" href="#vegetarian-note" aria-label="District-marked vegetarian choice">V</a>
+                          )}
+                        </p>
+                      );
+                    })
                   )}
                 </article>
               );
