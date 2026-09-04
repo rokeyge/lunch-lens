@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#195448"/>
+      <stop offset="100%" stop-color="#0f3830"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  
+  <!-- App Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  
+  <!-- Lunchbox Handle -->
+  <path d="M196 150 C196 100, 316 100, 316 150" fill="none" stroke="url(#gold)" stroke-width="22" stroke-linecap="round" filter="url(#shadow)"/>
+  
+  <!-- Lunchbox Body -->
+  <g filter="url(#shadow)">
+    <!-- Main Box -->
+    <rect x="96" y="140" width="320" height="260" rx="32" fill="#ffffff"/>
+    
+    <!-- Top Lid Section -->
+    <path d="M96 172 C96 154, 110 140, 128 140 L384 140 C402 140, 416 154, 416 172 L416 210 L96 210 Z" fill="#e2ede9"/>
+    
+    <!-- Dividing Line / Seam -->
+    <line x1="96" y1="210" x2="416" y2="210" stroke="#cbd5e1" stroke-width="3"/>
+    
+    <!-- Gold Latches -->
+    <rect x="140" y="196" width="36" height="28" rx="6" fill="url(#gold)"/>
+    <rect x="336" y="196" width="36" height="28" rx="6" fill="url(#gold)"/>
+    <circle cx="256" cy="210" r="14" fill="url(#gold)"/>
+
+    <!-- Brand Letter L -->
+    <text x="256" y="348" font-family="Georgia, serif" font-size="120" font-weight="bold" fill="#164e43" text-anchor="middle">L</text>
+  </g>
+</svg>

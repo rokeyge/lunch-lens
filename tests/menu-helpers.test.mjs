@@ -77,3 +77,22 @@ test("menu-pipeline exports cleanMealName for ingestion normalization", async ()
   assert.equal(pipelineClean("Bean, rice & cheese burrito (V)"), "Bean, rice & cheese burrito");
 });
 
+test("PWA manifest contains valid metadata and required icons", async () => {
+  const { readFile, access } = await import("node:fs/promises");
+  const manifest = JSON.parse(await readFile(new URL("../public/manifest.webmanifest", import.meta.url), "utf8"));
+  assert.equal(manifest.name, "Lunchbox SMFC");
+  assert.equal(manifest.short_name, "Lunchbox");
+  assert.equal(manifest.display, "standalone");
+  assert.ok(manifest.icons.length >= 3, "should have at least 3 icon definitions");
+
+  // Verify icon files physically exist
+  for (const icon of manifest.icons) {
+    const filename = icon.src.replace(/^\.\//, "");
+    await assert.doesNotReject(
+      access(new URL(`../public/${filename}`, import.meta.url)),
+      `Icon file public/${filename} should exist`
+    );
+  }
+});
+
+

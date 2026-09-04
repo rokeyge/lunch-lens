@@ -15,6 +15,7 @@ import {
   getInitialDayForWeek,
   getRelevantSchoolDate
 } from "./utils/menu-helpers";
+import { InstallModal, BeforeInstallPromptEvent } from "./components/InstallModal";
 
 export type { Choice, MenuDay };
 
@@ -102,12 +103,32 @@ export default function App() {
   const [weekIndex, setWeekIndex] = useState(currentWeek);
   const [vegetarianOnly, setVegetarianOnly] = useState(false);
 
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showInstallModal, setShowInstallModal] = useState(false);
+
   const mealsByDate = useMemo(() => new Map(activeMenu.days.map((meal) => [meal.date, meal])), [activeMenu.days]);
 
   // Ensure weekIndex stays strictly within valid bounds if program week count changes
   useEffect(() => {
     setWeekIndex((prev) => Math.max(0, Math.min(prev, weeks.length - 1)));
   }, [weeks.length]);
+
+  // Check standalone mode and capture Android install prompt
+  useEffect(() => {
+    const isStandaloneMode =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    setIsStandalone(isStandaloneMode);
+
+    const handlePrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener("beforeinstallprompt", handlePrompt);
+    return () => window.removeEventListener("beforeinstallprompt", handlePrompt);
+  }, []);
 
   const displayedWeek = weeks[weekIndex] || weeks[0];
 
@@ -226,13 +247,38 @@ export default function App() {
     }
   };
 
+  const handleOpenInstall = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt().then(() => {
+        deferredPrompt.userChoice.then((choice) => {
+          if (choice.outcome === "accepted") setDeferredPrompt(null);
+        });
+      });
+    } else {
+      setShowInstallModal(true);
+    }
+  };
+
   return (
     <main>
       <header className="topbar">
-        <a className="brand" href="#top" aria-label="Lunchbox SMFC home">
-          <span className="brand-mark">L</span>
-          <span>Lunchbox <em>SMFC</em></span>
-        </a>
+        <div className="topbar-main">
+          <a className="brand" href="#top" aria-label="Lunchbox SMFC home">
+            <span className="brand-mark">L</span>
+            <span>Lunchbox <em>SMFC</em></span>
+          </a>
+          {!isStandalone && (
+            <button
+              type="button"
+              className="save-app-btn"
+              onClick={handleOpenInstall}
+              aria-label="Add Lunchbox shortcut to your phone home screen"
+            >
+              <span aria-hidden="true" className="save-icon">📱</span>
+              <span className="save-label">Add to Phone</span>
+            </button>
+          )}
+        </div>
         <div className="school-selector-wrap">
           <label htmlFor="school-select" className="visually-hidden">Select School</label>
           <select
@@ -468,6 +514,12 @@ export default function App() {
         <span>Transcribed from the SMFCSD {monthLabel} menu.</span>
         <span>Checked {formatCheckedAt(activeMenu.checkedAt)} · {activeMenu.automated ? "Automated check" : "Verified transcription"}</span>
       </footer>
+
+      <InstallModal
+        isOpen={showInstallModal}
+        onClose={() => setShowInstallModal(false)}
+        deferredPrompt={deferredPrompt}
+      />
     </main>
   );
 }

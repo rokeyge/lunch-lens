@@ -75,6 +75,40 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
   font-family: Georgia, serif;
 }
 
+.topbar-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.save-app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--paper);
+  color: var(--green);
+  border: 1.5px solid var(--green);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(27, 77, 62, 0.06);
+}
+.save-app-btn:hover {
+  background: var(--green);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.save-app-btn:active {
+  transform: translateY(0);
+}
+.save-icon {
+  font-size: 14px;
+}
+
 .school-selector-wrap {
   display: flex;
   align-items: center;
@@ -564,8 +598,18 @@ footer {
     align-items: stretch;
     gap: 10px;
   }
+  .topbar-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
   .brand {
     font-size: 19px;
+  }
+  .save-app-btn {
+    padding: 5px 10px;
+    font-size: 12px;
   }
   .school-selector-wrap {
     max-width: 100%;
@@ -737,6 +781,208 @@ footer {
     flex-direction: column;
     gap: 8px;
   }
+}
+
+/* Install Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 56, 50, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  animation: modalFadeIn 0.2s ease;
+}
+
+.install-modal {
+  background: var(--paper);
+  border-radius: 20px;
+  max-width: 440px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--line);
+  position: relative;
+  animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--cream);
+  color: var(--muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+.modal-close-btn:hover {
+  color: var(--ink);
+  background: var(--line);
+}
+
+.install-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.install-icon-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+.install-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 2px;
+  color: var(--ink);
+}
+
+.install-subtitle {
+  font-size: 13px;
+  color: var(--green);
+  font-weight: 600;
+  margin: 0;
+}
+
+.install-benefit {
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+
+.install-prompt-action {
+  text-align: center;
+  padding: 12px 0;
+}
+.install-primary-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.install-primary-btn:hover {
+  background: var(--green-hover);
+}
+.install-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+
+.install-steps {
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.install-steps h3 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.install-steps ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.install-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.step-glyph {
+  display: inline-block;
+  font-weight: bold;
+  color: var(--green);
+  font-size: 14px;
+}
+
+.install-footer-actions {
+  display: flex;
+  gap: 10px;
+}
+.share-btn {
+  flex: 1;
+  padding: 10px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.share-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+.dismiss-btn {
+  padding: 10px 20px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.dismiss-btn:hover {
+  background: var(--green-hover);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
