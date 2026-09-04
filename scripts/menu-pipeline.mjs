@@ -254,7 +254,7 @@ export function validateMenu(menu, expectedMonth = menu.month) {
 
 const GEMINI_API_KEY = process.env.LUNCH_KEY || process.env.GEMINI_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
 const MODEL = GEMINI_API_KEY ? GEMINI_MODEL : OPENAI_MODEL;
 

@@ -4,7 +4,7 @@ import { PROGRAMS } from "./menu-pipeline.mjs";
 
 const CURRENT_PATH = fileURLToPath(new URL("../src/data/current.json", import.meta.url));
 const GEMINI_API_KEY = process.env.LUNCH_KEY || process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 
 if (!GEMINI_API_KEY) {
   console.error("Error: LUNCH_KEY or GEMINI_API_KEY environment variable is required.");
