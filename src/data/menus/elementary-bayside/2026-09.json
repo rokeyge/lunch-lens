@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "menuType": "elementary-bayside",
+  "month": "2026-09",
+  "title": "September 2026 Bayside elementary lunch",
+  "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/september-bayside-elementary-school-menus",
+  "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1788454392/smfcsdnet/ebdl7ose2eeiqibducjf/SEPTBAYSIDELUNCHMENU.png",
+  "sourceImagePath": "menu-sources/elementary-bayside-2026-09.png",
+  "sourceSha256": "cccd868ab15b1bc74d7a57d94e838e2c749794eade851bcb0379ea4529326226",
+  "checkedAt": "2026-09-03",
+  "automated": false,
+  "model": "manual transcription",
+  "dailyNote": "Entrée, yogurt pack or sunflower-butter sandwich, fruit, vegetable, and milk.",
+  "days": [
+    {
+      "date": "2026-09-01",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Beef taquitos with salsa",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean, rice & cheese burrito",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Bag lunch: turkey & cheese sandwich, Cheez-It crackers, baby carrots, fruit, veggie juice & milk",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-03",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken Alfredo pasta",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie nuggets, fries & crackers",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-04",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza",
+          "vegetarian": true
+        },
+        {
+          "name": "Pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-07",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-09-08",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken adobo, potatoes & rice",
+          "vegetarian": false
+        },
+        {
+          "name": "Cheese bites with marinara",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Bag lunch: turkey & cheese sandwich, Cheez-It crackers, baby carrots, fruit, veggie juice & milk",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-10",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Teriyaki chicken dumplings with veggie fried rice",
+          "vegetarian": false
+        },
+        {
+          "name": "Cheese enchiladas in chili verde sauce",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-11",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza",
+          "vegetarian": true
+        },
+        {
+          "name": "Pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-14",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Turkey nachos & tortilla chips",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie burger & fries",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-15",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese breadsticks & marinara sauce",
+          "vegetarian": true
+        },
+        {
+          "name": "Tinga chicken rice bowl",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-16",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Bag lunch: turkey & cheese sandwich, Cheez-It crackers, baby carrots, fruit, veggie juice & milk",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-17",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Pollo Loco drumstick, cilantro rice & corn",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean & cheese pupusa with curtido",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-18",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza",
+          "vegetarian": true
+        },
+        {
+          "name": "Pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-21",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-09-22",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken nuggets & fries",
+          "vegetarian": false
+        },
+        {
+          "name": "Creamy tomato curry tortellini with garlic toast",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Bag lunch: turkey & cheese sandwich, Cheez-It crackers, baby carrots, fruit, veggie juice & milk",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-24",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Macaroni & cheese",
+          "vegetarian": true
+        },
+        {
+          "name": "Chicken corn dog",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza",
+          "vegetarian": true
+        },
+        {
+          "name": "Pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-28",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken tinga masala with rice & naan bread",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie burger & fries",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-29",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Beef taquitos with salsa",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean, rice & cheese burrito",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-30",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Bag lunch: turkey & cheese sandwich, Cheez-It crackers, baby carrots, fruit, veggie juice & milk",
+          "vegetarian": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 1,
+  "menuType": "middle-special-6-8",
+  "month": "2026-09",
+  "title": "September 2026 6–8 schools lunch",
+  "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/september-6-8-menus-parkside-fiesta-gardens-north-shoreview",
+  "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1788193975/smfcsdnet/ma5naefroobunuoblivb/SEPTEMBER20266-8LUNCHMENU.png",
+  "sourceImagePath": "menu-sources/middle-special-6-8-2026-09.png",
+  "sourceSha256": "77f33681986022c6d9c87ccdc72c7f5de7a38af21f30dbcf1326bf928a7fffe0",
+  "checkedAt": "2026-09-03",
+  "automated": false,
+  "model": "manual transcription",
+  "dailyNote": "Entrée, yogurt pack, wowbutter pack, fruit, vegetables, nonfat chocolate or 1% white milk.",
+  "days": [
+    {
+      "date": "2026-09-01",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Beef taquitos with salsa",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean, rice & cheese burrito (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Turkey bacon club sandwich",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Orange chicken with vegetable fried rice",
+          "vegetarian": false
+        },
+        {
+          "name": "NEW - Tofu in butter simmer sauce, rice & naan bread (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Southwest chicken fiesta salad",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-03",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken Alfredo pasta",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie nuggets, French fries & crackers (V)",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-04",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza round (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Beef pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-07",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-09-08",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken adobo, potatoes and rice",
+          "vegetarian": false
+        },
+        {
+          "name": "Cheese bites (V) w/ marinara sauce",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Beef Stroganoff with rotini pasta",
+          "vegetarian": false
+        },
+        {
+          "name": "Grilled cheese (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Chicken Caesar salad & crackers",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-10",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Teriyaki chicken dumplings with veggie fried rice",
+          "vegetarian": false
+        },
+        {
+          "name": "Cheese enchiladas in chile verde sauce (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Chicken Bruschetta sandwich",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-11",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza round (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Beef pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-14",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Turkey nachos & tortilla chips",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie burger & fries (V)",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-15",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese breadsticks & marinara sauce (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Tinga chicken rice bowl",
+          "vegetarian": false
+        },
+        {
+          "name": "BBQ ranch chicken & cheddar wrap",
+          "vegetarian": false
+        },
+        {
+          "name": "Turkey & cheese on Parisian bread",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-16",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken burger with French fries",
+          "vegetarian": false
+        },
+        {
+          "name": "Vegetarian Florentine pasta (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Southwest chicken fiesta salad",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-17",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Pollo Loco drumstick, cilantro rice & corn",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean & cheese pupusa w/curtido (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Ground beef gyro with tzatziki sauce",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-18",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza round (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Beef pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-21",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-09-22",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken nuggets & French fries",
+          "vegetarian": false
+        },
+        {
+          "name": "NEW - Creamy tomato curry tortellini with garlic toast (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Beef Philly cheese sandwich",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "status": "service",
+      "choices": [
+        {
+          "name": "BBQ chicken meatballs, mashed potatoes & garlic bread",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean & cheese quesadilla (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Chicken Caesar salad & crackers",
+          "vegetarian": false
+        },
+        {
+          "name": "Hummus pack: hummus, cucumber, pita chips",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-24",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Macaroni & cheese (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Chicken corn dog",
+          "vegetarian": false
+        },
+        {
+          "name": "Breaded spicy chicken salad with ranch dressing",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza round (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Beef pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-28",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken tikka masala w/rice & naan bread",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie burger & fries (V)",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-29",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Beef taquitos with salsa",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean, rice & cheese burrito (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Turkey bacon club sandwich",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-09-30",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Orange chicken with vegetable fried rice",
+          "vegetarian": false
+        },
+        {
+          "name": "Tofu in butter simmer sauce, rice & naan bread (V)",
+          "vegetarian": true
+        },
+        {
+          "name": "Southwest chicken fiesta salad",
+          "vegetarian": false
+        }
+      ]
+    }
+  ]
+}

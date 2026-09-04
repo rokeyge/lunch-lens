@@ -13,6 +13,7 @@ on:
 permissions:
   contents: write
   actions: write
+  issues: write
 
 concurrency:
   group: menu-update
@@ -23,17 +24,48 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
       - name: Discover, extract, and verify menu
+        id: pipeline
         env:
           OPENAI_API_KEY: ${{ secrets.APIKEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.5' }}
           FORCE_MENU_UPDATE: ${{ inputs.force && 'true' || 'false' }}
         run: npm run menu:update
+
+      - name: Report failure via GitHub issue
+        if: failure() && steps.pipeline.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_TITLE="District menu update failure"
+          EXISTING_ISSUE=$(gh issue list --state open --search "$ISSUE_TITLE" --json number --jq '.[0].number')
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          BODY="The automated district menu update failed during workflow run: $RUN_URL"$'\n\n'"Please inspect the workflow run logs to see whether discovery, image fetch, extraction, or verification failed."
+          if [ -n "$EXISTING_ISSUE" ]; then
+            gh issue comment "$EXISTING_ISSUE" --body "Update attempt failed again in run: $RUN_URL"
+          else
+            gh issue create --title "$ISSUE_TITLE" --body "$BODY" --label "bug"
+          fi
+
+      - name: Close resolved failure issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_TITLE="District menu update failure"
+          EXISTING_ISSUE=$(gh issue list --state open --search "$ISSUE_TITLE" --json number --jq '.[0].number')
+          if [ -n "$EXISTING_ISSUE" ]; then
+            gh issue close "$EXISTING_ISSUE" --comment "Resolved: District menu update succeeded in run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}."
+          fi
+
       - name: Check for a published update
         id: changes
         shell: bash
@@ -43,14 +75,16 @@ jobs:
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
       - name: Commit verified menu
         if: steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src/data/current.json src/data/menus public/menu-sources
-          git commit -m "Update elementary lunch menu"
+          git commit -m "Update district lunch menus"
           git push
+
       - name: Deploy updated menu
         if: steps.changes.outputs.changed == 'true'
         env:

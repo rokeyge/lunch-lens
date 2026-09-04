@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import menuJson from "./data/current.json";
+import { useEffect, useMemo, useState } from "react";
+import currentDataJson from "./data/current.json";
+import { SCHOOLS, DEFAULT_SCHOOL_ID, getSchool, School } from "./data/schools";
 
-type Choice = { name: string; vegetarian: boolean };
-type MenuDay = { date: string; status: "service" | "no-school"; choices: Choice[] };
-type Menu = {
+export type Choice = { name: string; vegetarian: boolean };
+export type MenuDay = { date: string; status: "service" | "no-school"; choices: Choice[] };
+export type MenuProgram = {
   schemaVersion: number;
   menuType: string;
   month: string;
@@ -19,7 +20,14 @@ type Menu = {
   days: MenuDay[];
 };
 
-const MENU = menuJson as Menu;
+type CurrentData = {
+  schemaVersion: number;
+  updatedAt: string;
+  defaultProgram: string;
+  programs: Record<string, MenuProgram>;
+} & MenuProgram;
+
+const currentData = currentDataJson as unknown as CurrentData;
 
 const dateParts = (date: string) => ({
   weekday: new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`)),
@@ -65,7 +73,6 @@ const formatMonth = (month: string) => {
 const formatCheckedAt = (date: string) => new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
-  year: "numeric",
   timeZone: "UTC",
 }).format(new Date(`${date.slice(0, 10)}T12:00:00Z`));
 
@@ -77,18 +84,38 @@ const formatWeek = (dates: string[]) => {
   return `${firstLabel}–${lastLabel}`;
 };
 
+const isServiceDay = (dateStr: string, mealsMap: Map<string, MenuDay>) => {
+  const meal = mealsMap.get(dateStr);
+  return meal?.status === "service";
+};
+
+const getInitialDayForWeek = (weekDates: string[], todayStr: string, mealsMap: Map<string, MenuDay>) => {
+  if (weekDates.includes(todayStr)) {
+    if (isServiceDay(todayStr, mealsMap)) return todayStr;
+    const todayIndex = weekDates.indexOf(todayStr);
+    for (let i = todayIndex + 1; i < weekDates.length; i++) {
+      if (isServiceDay(weekDates[i], mealsMap)) return weekDates[i];
+    }
+    return todayStr;
+  }
+  for (const d of weekDates) {
+    if (isServiceDay(d, mealsMap)) return d;
+  }
+  return weekDates[0];
+};
+
 function MealCard({ meal, today, outsideMonth }: { meal?: MenuDay; today: boolean; outsideMonth: boolean }) {
   const date = meal?.date ?? "";
-  const { weekday, day } = dateParts(date);
+  const { weekday, day } = date ? dateParts(date) : { weekday: "", day: 0 };
   const choices = (meal?.choices ?? [])
     .slice()
     .sort((a, b) => Number(a.vegetarian) - Number(b.vegetarian));
 
   return (
-    <article className={`meal-card ${today ? "featured" : ""}`} data-today={today || undefined}>
+    <article className={`meal-card ${today ? "featured" : ""}`} data-today={today || undefined} tabIndex={0}>
       <div className="meal-date">
         <span className="weekday">{weekday}</span>
-        <strong>{day}</strong>
+        <strong>{day || "—"}</strong>
         {today && <span className="today-pill">Today</span>}
       </div>
       {!meal || outsideMonth ? (
@@ -102,7 +129,9 @@ function MealCard({ meal, today, outsideMonth }: { meal?: MenuDay; today: boolea
               <span className="choice-number">{index + 1}</span>
               <h3>
                 {choice.name}
-                {choice.vegetarian && <a className="veg-icon" href="#vegetarian-note" aria-label="District-marked vegetarian choice">V</a>}
+                {choice.vegetarian && (
+                  <a className="veg-icon" href="#vegetarian-note" aria-label="District-marked vegetarian choice">V</a>
+                )}
               </h3>
             </div>
           ))}
@@ -114,41 +143,52 @@ function MealCard({ meal, today, outsideMonth }: { meal?: MenuDay; today: boolea
 
 export default function App() {
   const today = localDateKey();
-  const weeks = useMemo(() => buildWeeks(MENU.month), []);
+  const [schoolId, setSchoolId] = useState(() => localStorage.getItem("lunchbox-school") || DEFAULT_SCHOOL_ID);
+  const selectedSchool = useMemo(() => getSchool(schoolId), [schoolId]);
+
+  const activeMenu: MenuProgram = useMemo(() => {
+    return currentData.programs?.[selectedSchool.programId] ?? currentData;
+  }, [selectedSchool.programId]);
+
+  const weeks = useMemo(() => buildWeeks(activeMenu.month), [activeMenu.month]);
   const matchingWeek = weeks.findIndex((week) => week.includes(today));
-  const currentWeek = matchingWeek >= 0 ? matchingWeek : today < `${MENU.month}-01` ? 0 : weeks.length - 1;
+  const currentWeek = matchingWeek >= 0 ? matchingWeek : today < `${activeMenu.month}-01` ? 0 : weeks.length - 1;
+
   const [view, setView] = useState<"week" | "month">("week");
   const [weekIndex, setWeekIndex] = useState(currentWeek);
   const [vegetarianOnly, setVegetarianOnly] = useState(false);
-  const weekStrip = useRef<HTMLDivElement>(null);
-  const mealsByDate = useMemo(() => new Map(MENU.days.map((meal) => [meal.date, meal])), []);
+
+  const mealsByDate = useMemo(() => new Map(activeMenu.days.map((meal) => [meal.date, meal])), [activeMenu.days]);
+
+  const displayedWeek = weeks[weekIndex] || weeks[0];
+
+  const [selectedMobileDate, setSelectedMobileDate] = useState(() =>
+    getInitialDayForWeek(displayedWeek, today, mealsByDate)
+  );
 
   useEffect(() => {
     const savedView = localStorage.getItem("lunchbox-view");
-    const savedWeek = Number(localStorage.getItem("lunchbox-week"));
-    const savedWeekMonth = localStorage.getItem("lunchbox-week-month");
     const savedVegetarian = localStorage.getItem("lunchbox-vegetarian");
 
     if (savedView === "week" || savedView === "month") setView(savedView);
-    if (savedWeekMonth === MENU.month && Number.isInteger(savedWeek) && savedWeek >= 0 && savedWeek < weeks.length) setWeekIndex(savedWeek);
     if (savedVegetarian === "true") setVegetarianOnly(true);
-  }, [weeks.length]);
+  }, []);
 
   useEffect(() => {
-    if (view === "week") {
-      requestAnimationFrame(() => weekStrip.current?.querySelector("[data-today='true']")?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }));
-    }
-  }, [view, weekIndex]);
+    setSelectedMobileDate((prev) => {
+      if (displayedWeek.includes(prev)) return prev;
+      return getInitialDayForWeek(displayedWeek, today, mealsByDate);
+    });
+  }, [displayedWeek, today, mealsByDate]);
+
+  const handleSchoolChange = (newSchoolId: string) => {
+    setSchoolId(newSchoolId);
+    localStorage.setItem("lunchbox-school", newSchoolId);
+  };
 
   const changeView = (value: "week" | "month") => {
     setView(value);
     localStorage.setItem("lunchbox-view", value);
-  };
-
-  const changeWeek = (value: number) => {
-    setWeekIndex(value);
-    localStorage.setItem("lunchbox-week", String(value));
-    localStorage.setItem("lunchbox-week-month", MENU.month);
   };
 
   const changeVegetarian = (value: boolean) => {
@@ -156,12 +196,36 @@ export default function App() {
     localStorage.setItem("lunchbox-vegetarian", String(value));
   };
 
+  const jumpToToday = () => {
+    setWeekIndex(currentWeek);
+    const targetWeek = weeks[currentWeek];
+    setSelectedMobileDate(getInitialDayForWeek(targetWeek, today, mealsByDate));
+  };
+
+  const isAwayFromToday = weekIndex !== currentWeek || (displayedWeek.includes(today) && selectedMobileDate !== today && isServiceDay(today, mealsByDate));
+
   const visibleChoices = (meal: MenuDay) => vegetarianOnly
     ? meal.choices.filter((choice) => choice.vegetarian)
     : meal.choices;
 
-  const monthLabel = formatMonth(MENU.month);
-  const displayedWeek = weeks[weekIndex];
+  const monthLabel = formatMonth(activeMenu.month);
+  const currentMonthKey = today.slice(0, 7);
+  const isFutureMonthUnavailable = currentMonthKey > activeMenu.month;
+
+  const selectedMobileMeal = mealsByDate.get(selectedMobileDate);
+  const selectedMobileMealFiltered = selectedMobileMeal
+    ? { ...selectedMobileMeal, choices: visibleChoices(selectedMobileMeal) }
+    : undefined;
+
+  const schoolCategories = useMemo(() => {
+    const groups = new Map<School["category"], School[]>();
+    for (const school of SCHOOLS) {
+      const list = groups.get(school.category) || [];
+      list.push(school);
+      groups.set(school.category, list);
+    }
+    return Array.from(groups.entries());
+  }, []);
 
   return (
     <main>
@@ -170,66 +234,199 @@ export default function App() {
           <span className="brand-mark">L</span>
           <span>Lunchbox <em>SMFC</em></span>
         </a>
-        <span className="unofficial">Unofficial community project</span>
+        <div className="school-selector-wrap">
+          <label htmlFor="school-select" className="visually-hidden">Select School</label>
+          <select
+            id="school-select"
+            className="school-select"
+            value={schoolId}
+            onChange={(e) => handleSchoolChange(e.target.value)}
+            aria-label="Select school to view menu"
+          >
+            {schoolCategories.map(([category, schools]) => (
+              <optgroup key={category} label={category}>
+                {schools.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} ({s.grades})
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </div>
       </header>
+
+      <div className="freshness-bar-container">
+        {isFutureMonthUnavailable ? (
+          <aside className="freshness-banner warning" role="status">
+            <span>{formatMonth(currentMonthKey)} menu has not been processed yet</span>
+            <span className="dot" aria-hidden="true">·</span>
+            <a href={activeMenu.sourcePageUrl} target="_blank" rel="noreferrer">
+              View district source <span aria-hidden="true">↗</span>
+            </a>
+          </aside>
+        ) : (
+          <aside className="freshness-banner" role="status">
+            <span>{monthLabel} menu</span>
+            <span className="dot" aria-hidden="true">·</span>
+            <span>Checked {formatCheckedAt(activeMenu.checkedAt)}</span>
+            <span className="dot" aria-hidden="true">·</span>
+            <a href={`${import.meta.env.BASE_URL}${activeMenu.sourceImagePath}`} target="_blank" rel="noreferrer">
+              View original <span aria-hidden="true">↗</span>
+            </a>
+          </aside>
+        )}
+      </div>
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">{monthLabel} · Elementary lunch</p>
+          <p className="eyebrow">{monthLabel} · Lunch Menu</p>
           <h1>What’s for lunch?</h1>
         </div>
         <div className="menu-context">
-          <span>District menu</span>
-          <strong>Standard elementary schools</strong>
+          <span>Selected School</span>
+          <strong>{selectedSchool.name}</strong>
+          <small>{activeMenu.title}</small>
         </div>
       </section>
 
       <section className="content-shell" aria-label="Lunch menu">
         <div className="toolbar">
-          <div className="tabs" role="group" aria-label="Choose menu range">
+          <div className="tabs" role="tablist" aria-label="Choose menu range">
             {(["week", "month"] as const).map((option) => (
-              <button key={option} className={view === option ? "active" : ""} onClick={() => changeView(option)}>
+              <button
+                key={option}
+                role="tab"
+                aria-selected={view === option}
+                className={view === option ? "active" : ""}
+                onClick={() => changeView(option)}
+              >
                 {option[0].toUpperCase() + option.slice(1)}
               </button>
             ))}
           </div>
-          <label className="veg-toggle">
-            <input type="checkbox" checked={vegetarianOnly} onChange={(event) => changeVegetarian(event.target.checked)} />
-            <span>Vegetarian only</span>
-          </label>
+
+          <div className="toolbar-actions">
+            {isAwayFromToday && (
+              <button className="today-jump-btn" onClick={jumpToToday} aria-label="Jump back to current week and today">
+                Today
+              </button>
+            )}
+            <label className="veg-toggle">
+              <input type="checkbox" checked={vegetarianOnly} onChange={(e) => changeVegetarian(e.target.checked)} />
+              <span>Vegetarian only</span>
+            </label>
+          </div>
         </div>
 
         {view === "week" ? (
           <>
             <div className="week-nav">
-              <button aria-label="Previous week" disabled={weekIndex === 0} onClick={() => changeWeek(weekIndex - 1)}>←</button>
-              <strong>{formatWeek(displayedWeek)}</strong>
-              <button aria-label="Next week" disabled={weekIndex === weeks.length - 1} onClick={() => changeWeek(weekIndex + 1)}>→</button>
+              <button
+                aria-label="Previous week"
+                disabled={weekIndex === 0}
+                onClick={() => setWeekIndex(weekIndex - 1)}
+              >
+                ←
+              </button>
+              <div className="week-label-wrap">
+                <strong>{formatWeek(displayedWeek)}</strong>
+              </div>
+              <button
+                aria-label="Next week"
+                disabled={weekIndex === weeks.length - 1}
+                onClick={() => setWeekIndex(weekIndex + 1)}
+              >
+                →
+              </button>
             </div>
-            <div className="week-strip" ref={weekStrip}>
+
+            {/* Mobile Layout: Compact 5-day pill row + expanded card below */}
+            <div className="mobile-week-container">
+              <div className="mobile-day-tabs" role="tablist" aria-label="Select weekday">
+                {displayedWeek.map((date) => {
+                  const { weekday, day } = dateParts(date);
+                  const isToday = date === today;
+                  const isSelected = date === selectedMobileDate;
+                  const meal = mealsByDate.get(date);
+                  const isNoSchool = meal?.status === "no-school";
+
+                  return (
+                    <button
+                      key={date}
+                      role="tab"
+                      aria-selected={isSelected}
+                      aria-label={`${weekday}, ${date}${isToday ? " (Today)" : ""}${isNoSchool ? " (No school)" : ""}`}
+                      className={`mobile-day-tab ${isSelected ? "selected" : ""} ${isToday ? "is-today" : ""} ${isNoSchool ? "is-closed" : ""}`}
+                      onClick={() => setSelectedMobileDate(date)}
+                    >
+                      <span className="day-name">{weekday}</span>
+                      <strong className="day-num">{day}</strong>
+                      {isToday && <span className="today-dot" aria-hidden="true" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mobile-expanded-card" role="tabpanel">
+                <MealCard
+                  meal={selectedMobileMealFiltered ?? { date: selectedMobileDate, status: "service", choices: [] }}
+                  today={selectedMobileDate === today}
+                  outsideMonth={!selectedMobileDate.startsWith(activeMenu.month)}
+                />
+              </div>
+            </div>
+
+            {/* Desktop / Tablet Layout: Full 5-day row */}
+            <div className="desktop-week-row">
               {displayedWeek.map((date) => {
                 const meal = mealsByDate.get(date);
                 const filtered = meal ? { ...meal, choices: visibleChoices(meal) } : undefined;
-                return <MealCard meal={filtered ?? { date, status: "service", choices: [] }} today={date === today} outsideMonth={!date.startsWith(MENU.month)} key={date} />;
+                return (
+                  <MealCard
+                    meal={filtered ?? { date, status: "service", choices: [] }}
+                    today={date === today}
+                    outsideMonth={!date.startsWith(activeMenu.month)}
+                    key={date}
+                  />
+                );
               })}
             </div>
           </>
         ) : (
-          <div className="calendar" aria-label={`${monthLabel} lunch calendar`}>
-            {(["Mon", "Tue", "Wed", "Thu", "Fri"] as const).map((day) => <div className="calendar-heading" key={day}>{day}</div>)}
+          <div className="calendar" aria-label={`${monthLabel} lunch calendar`} role="region">
+            {(["Mon", "Tue", "Wed", "Thu", "Fri"] as const).map((day) => (
+              <div className="calendar-heading" key={day} aria-hidden="true">{day}</div>
+            ))}
             {weeks.flat().map((date) => {
               const meal = mealsByDate.get(date);
               const choices = meal ? visibleChoices(meal).slice().sort((a, b) => Number(a.vegetarian) - Number(b.vegetarian)) : [];
-              const outside = !date.startsWith(MENU.month);
+              const outside = !date.startsWith(activeMenu.month);
               return (
-                <article className={`calendar-cell ${outside ? "outside" : ""} ${date === today ? "current" : ""}`} key={date}>
-                  <div className="calendar-date">{dateParts(date).day}{date === today && <span>Today</span>}</div>
-                  {outside ? <small>{formatMonth(date.slice(0, 7)).split(" ")[0]}</small> : meal?.status === "no-school" ? <strong className="calendar-closed">No school</strong> : choices.map((choice) => (
-                    <p className={choice.vegetarian ? "calendar-veg" : ""} key={choice.name}>
-                      {choice.name}
-                      {choice.vegetarian && <a className="veg-icon" href="#vegetarian-note" aria-label="District-marked vegetarian choice">V</a>}
-                    </p>
-                  ))}
+                <article
+                  className={`calendar-cell ${outside ? "outside" : ""} ${date === today ? "current" : ""}`}
+                  key={date}
+                  tabIndex={0}
+                  aria-label={`${date}: ${outside ? "outside menu month" : meal?.status === "no-school" ? "no school" : choices.map((c) => c.name).join(", ")}`}
+                >
+                  <div className="calendar-date">
+                    {dateParts(date).day}
+                    {date === today && <span>Today</span>}
+                  </div>
+                  {outside ? (
+                    <small>{formatMonth(date.slice(0, 7)).split(" ")[0]}</small>
+                  ) : meal?.status === "no-school" ? (
+                    <strong className="calendar-closed">No school</strong>
+                  ) : (
+                    choices.map((choice) => (
+                      <p className={choice.vegetarian ? "calendar-veg" : ""} key={choice.name}>
+                        {choice.name}
+                        {choice.vegetarian && (
+                          <a className="veg-icon" href="#vegetarian-note" aria-label="District-marked vegetarian choice">V</a>
+                        )}
+                      </p>
+                    ))
+                  )}
                 </article>
               );
             })}
@@ -237,19 +434,23 @@ export default function App() {
         )}
 
         <p className="daily-note">
-          <span><strong>Daily:</strong> {MENU.dailyNote}</span>
-          <span id="vegetarian-note"><span className="veg-key">V</span> District-marked vegetarian choice</span>
+          <span><strong>Daily:</strong> {activeMenu.dailyNote}</span>
+          <span id="vegetarian-note"><span className="veg-key" aria-hidden="true">V</span> District-marked vegetarian choice</span>
         </p>
       </section>
 
       <section className="safety-note">
-        <p><strong>Allergies:</strong> This is an unofficial transcription, not allergy guidance. Ingredients and substitutions can change; contact your school or Child Nutrition Services.</p>
-        <a href={`${import.meta.env.BASE_URL}${MENU.sourceImagePath}`} target="_blank" rel="noreferrer">Original district menu <span aria-hidden="true">↗</span></a>
+        <p>
+          <strong>Allergies:</strong> This is an unofficial transcription, not allergy guidance. Ingredients and substitutions can change; contact your school or Child Nutrition Services.
+        </p>
+        <a href={`${import.meta.env.BASE_URL}${activeMenu.sourceImagePath}`} target="_blank" rel="noreferrer">
+          Original district menu <span aria-hidden="true">↗</span>
+        </a>
       </section>
 
       <footer>
-        <span>Transcribed from the SMFCSD {monthLabel} elementary lunch menu.</span>
-        <span>Checked {formatCheckedAt(MENU.checkedAt)} · {MENU.automated ? "Automated double-check" : "Manual transcription"}</span>
+        <span>Transcribed from the SMFCSD {monthLabel} menu.</span>
+        <span>Checked {formatCheckedAt(activeMenu.checkedAt)} · {activeMenu.automated ? "Automated check" : "Verified transcription"}</span>
       </footer>
     </main>
   );

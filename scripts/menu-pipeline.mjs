@@ -9,6 +9,49 @@ const SOURCE_DIRECTORY = fileURLToPath(new URL("../public/menu-sources", import.
 const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 const MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
 
+export const PROGRAMS = [
+  {
+    id: "elementary-standard",
+    name: "Standard Elementary Lunch",
+    titlePattern: /ELEMENTARY SCHOOL MENUS?/i,
+    excludePattern: /BAYSIDE|6-8|MIDDLE|PRESCHOOL/i,
+    imagePattern: /ESLUNCH|lunch/i,
+    imageExcludePattern: /breakfast|middle|turnbull|bayside|6-8|JUNE/i
+  },
+  {
+    id: "elementary-bayside",
+    name: "Bayside Elementary Lunch",
+    titlePattern: /BAYSIDE ELEMENTARY/i,
+    excludePattern: /MIDDLE|PRESCHOOL/i,
+    imagePattern: /BAYSIDELUNCH|lunch/i,
+    imageExcludePattern: /breakfast|JUNE/i
+  },
+  {
+    id: "middle-district",
+    name: "District Middle School Lunch",
+    titlePattern: /MIDDLE SCHOOL MENUS/i,
+    excludePattern: /6-8|BAYSIDE|PRESCHOOL/i,
+    imagePattern: /MSLUNCH|lunch/i,
+    imageExcludePattern: /breakfast|6-8|bayside/i
+  },
+  {
+    id: "middle-special-6-8",
+    name: "Special 6–8 Schools Lunch",
+    titlePattern: /6-8 MENUS/i,
+    excludePattern: /PRESCHOOL/i,
+    imagePattern: /6-8LUNCH|lunch/i,
+    imageExcludePattern: /breakfast|bayside/i
+  },
+  {
+    id: "preschool",
+    name: "Preschool Lunch",
+    titlePattern: /PRESCHOOL MENUS/i,
+    excludePattern: /ELEMENTARY|MIDDLE/i,
+    imagePattern: /PRESCHOOL.*LUNCH|lunch/i,
+    imageExcludePattern: /breakfast/i
+  }
+];
+
 const extractionSchema = {
   type: "object",
   additionalProperties: false,
@@ -84,7 +127,7 @@ const targetYearForMonth = (postDate, targetMonthIndex) => {
   return year;
 };
 
-export function discoverElementaryPost(html) {
+export function discoverPostForProgram(html, program) {
   const articles = html.match(/<article\b[\s\S]*?<\/article>/gi) || [];
   const candidates = [];
 
@@ -92,7 +135,8 @@ export function discoverElementaryPost(html) {
     const titleMatch = article.match(/<div class="fsTitle[^"]*"[^>]*>[\s\S]*?<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
     if (!titleMatch) continue;
     const title = decodeHtml(titleMatch[2]);
-    if (!/ELEMENTARY SCHOOL MENUS?/i.test(title) || /BAYSIDE|6-8|MIDDLE|PRESCHOOL/i.test(title)) continue;
+    if (!program.titlePattern.test(title)) continue;
+    if (program.excludePattern && program.excludePattern.test(title)) continue;
 
     const monthIndex = MONTHS.findIndex((month) => new RegExp(`\\b${month}\\b`, "i").test(title));
     const dateMatch = article.match(/<time[^>]+datetime="([^"]+)"/i);
@@ -107,24 +151,32 @@ export function discoverElementaryPost(html) {
     });
   }
 
-  if (!candidates.length) throw new Error("Could not find the standard elementary lunch menu post.");
+  if (!candidates.length) throw new Error(`Could not find menu post for program ${program.name}.`);
   return candidates.sort((a, b) => b.postedAt.localeCompare(a.postedAt))[0];
 }
 
-export function discoverLunchImage(postHtml) {
+export function discoverElementaryPost(html) {
+  return discoverPostForProgram(html, PROGRAMS[0]);
+}
+
+export function discoverLunchImageForProgram(postHtml, program) {
   const decoded = postHtml.replaceAll("&quot;", '"').replaceAll("%22", '"').replaceAll("&amp;", "&");
   const urls = [...decoded.matchAll(/https:\/\/resources\.finalsite\.net\/images\/[^"'&<>\s]+?\.(?:png|jpe?g|webp)/gi)]
     .map((match) => match[0].replace(/,t_image_size_\d+/g, ""));
   const candidates = [...new Set(urls)]
-    .filter((url) => /lunch/i.test(url) && !/breakfast|middle|turnbull|bayside/i.test(url))
+    .filter((url) => program.imagePattern.test(url) && (!program.imageExcludePattern || !program.imageExcludePattern.test(url)))
     .sort((a, b) => {
       const aVersion = Number(a.match(/\/v(\d+)\//)?.[1] || 0);
       const bVersion = Number(b.match(/\/v(\d+)\//)?.[1] || 0);
       return bVersion - aVersion;
     });
 
-  if (!candidates.length) throw new Error("Could not find the full-size elementary lunch image in the district post.");
+  if (!candidates.length) throw new Error(`Could not find full-size lunch image for program ${program.name}.`);
   return candidates[0];
+}
+
+export function discoverLunchImage(postHtml) {
+  return discoverLunchImageForProgram(postHtml, PROGRAMS[0]);
 }
 
 const fetchBytes = async (url) => {
@@ -133,19 +185,22 @@ const fetchBytes = async (url) => {
   return { bytes: Buffer.from(await response.arrayBuffer()), contentType: response.headers.get("content-type") || "image/jpeg" };
 };
 
-export async function discoverSource() {
+export async function discoverSource(programId = "elementary-standard") {
+  const program = PROGRAMS.find((p) => p.id === programId) || PROGRAMS[0];
   const page = await fetch(MENU_PAGE_URL).then((response) => {
     if (!response.ok) throw new Error(`District menu page returned ${response.status}.`);
     return response.text();
   });
-  const post = discoverElementaryPost(page);
+  const post = discoverPostForProgram(page, program);
   const postHtml = await fetch(post.postUrl).then((response) => {
     if (!response.ok) throw new Error(`District menu post returned ${response.status}.`);
     return response.text();
   });
-  const imageUrl = discoverLunchImage(postHtml);
+  const imageUrl = discoverLunchImageForProgram(postHtml, program);
   const image = await fetchBytes(imageUrl);
   return {
+    programId: program.id,
+    programName: program.name,
     ...post,
     imageUrl,
     imageSha256: createHash("sha256").update(image.bytes).digest("hex"),
@@ -231,82 +286,84 @@ const callStructured = async ({ name, schema, instructions, prompt, imageDataUrl
   return JSON.parse(outputText(body));
 };
 
-const extract = (imageDataUrl, month, correction = "") => callStructured({
-  name: "elementary_lunch_menu",
+const extract = (imageDataUrl, month, programName, correction = "") => callStructured({
+  name: "school_lunch_menu",
   schema: extractionSchema,
   imageDataUrl,
   instructions: "You transcribe school lunch calendar images exactly into structured data. Do not infer ingredients, nutrition, allergens, or dietary properties. Treat vegetarian status as true only when the image explicitly marks the choice as vegetarian through its stated legend, symbol, or color key.",
-  prompt: `Transcribe the standard elementary LUNCH menu for ${month}. Include every Monday–Friday date in the month. Mark closures as no-school with no choices. Preserve meal wording and punctuation. Put general daily offerings in dailyNote, not as dated choices.${correction}`
+  prompt: `Transcribe the ${programName} menu for ${month}. Include every Monday–Friday date in the month. Mark closures as no-school with no choices. Preserve meal wording and punctuation. Put general daily offerings in dailyNote, not as dated choices.${correction}`
 });
 
-const review = (imageDataUrl, candidate) => callStructured({
-  name: "elementary_lunch_review",
+const review = (imageDataUrl, candidate, programName) => callStructured({
+  name: "school_lunch_review",
   schema: reviewSchema,
   imageDataUrl,
   instructions: "You are an independent transcription verifier. Compare the supplied JSON against the image character by character. Do not add or infer allergens, nutrition, ingredients, or dietary claims. Vegetarian is correct only when supported by the image's explicit legend, symbol, or color key.",
-  prompt: `Review this proposed transcription. Approve only when every weekday, closure, meal choice, vegetarian marking, and daily note matches the image.\n\n${JSON.stringify(candidate, null, 2)}`
+  prompt: `Review this proposed transcription for ${programName}. Approve only when every weekday, closure, meal choice, vegetarian marking, and daily note matches the image.\n\n${JSON.stringify(candidate, null, 2)}`
 });
 
-const readCurrent = async () => JSON.parse(await readFile(CURRENT_MENU_PATH, "utf8"));
+export const readCurrent = async () => JSON.parse(await readFile(CURRENT_MENU_PATH, "utf8"));
 
-const sourceAsset = (source) => {
+const sourceAsset = (source, programId) => {
   const extension = source.imageContentType.includes("png") ? "png" : source.imageContentType.includes("webp") ? "webp" : "jpg";
-  const relativePath = `menu-sources/${source.month}.${extension}`;
-  return { relativePath, filePath: `${SOURCE_DIRECTORY}/${source.month}.${extension}` };
+  const relativePath = `menu-sources/${programId}-${source.month}.${extension}`;
+  return { relativePath, filePath: `${SOURCE_DIRECTORY}/${programId}-${source.month}.${extension}` };
 };
 
 const pathExists = async (path) => access(path).then(() => true, () => false);
 
-const writePublishedFiles = async (menu, imageBytes, imageFilePath) => {
-  const serialized = `${JSON.stringify(menu, null, 2)}\n`;
-  await mkdir(ARCHIVE_DIRECTORY, { recursive: true });
-  await mkdir(SOURCE_DIRECTORY, { recursive: true });
-  await writeFile(`${ARCHIVE_DIRECTORY}/${menu.month}.json`, serialized);
-  await writeFile(CURRENT_MENU_PATH, serialized);
-  await writeFile(imageFilePath, imageBytes);
-};
+export async function updateProgramMenu(programId, force = process.env.FORCE_MENU_UPDATE === "true") {
+  const program = PROGRAMS.find((p) => p.id === programId);
+  if (!program) throw new Error(`Unknown program: ${programId}`);
 
-export async function updateMenu() {
-  const source = await discoverSource();
-  const current = await readCurrent();
-  const asset = sourceAsset(source);
-  if (current.sourceSha256 === source.imageSha256 && process.env.FORCE_MENU_UPDATE !== "true") {
-    if (!(await pathExists(asset.filePath)) || current.sourceImagePath !== asset.relativePath) {
-      const archived = { ...current, sourceImagePath: asset.relativePath };
-      await writePublishedFiles(archived, source.imageBytes, asset.filePath);
-      console.log(`Archived unchanged source image at public/${asset.relativePath}.`);
+  const source = await discoverSource(programId);
+  const currentData = await readCurrent();
+  const currentProgram = currentData.programs?.[programId] || currentData;
+  const asset = sourceAsset(source, programId);
+
+  if (currentProgram?.sourceSha256 === source.imageSha256 && !force) {
+    if (!(await pathExists(asset.filePath)) || currentProgram.sourceImagePath !== asset.relativePath) {
+      await mkdir(SOURCE_DIRECTORY, { recursive: true });
+      await writeFile(asset.filePath, source.imageBytes);
+      currentProgram.sourceImagePath = asset.relativePath;
+      await writeFile(CURRENT_MENU_PATH, JSON.stringify(currentData, null, 2) + "\n");
+      console.log(`[${programId}] Archived source image at public/${asset.relativePath}.`);
       return true;
     }
-    console.log(`No change: ${source.title} has the same image hash.`);
+    console.log(`[${programId}] No change: ${source.title} has the same image hash.`);
     return false;
   }
-  if (source.month < current.month) {
-    console.log(`No change: newest discovered menu ${source.month} is older than published menu ${current.month}.`);
+
+  if (currentProgram?.month && source.month < currentProgram.month) {
+    console.log(`[${programId}] No change: newest discovered menu ${source.month} is older than published menu ${currentProgram.month}.`);
     return false;
   }
-  if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is required when a new or forced menu extraction needs an LLM review.");
+
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error(`OPENAI_API_KEY is required when a new or forced menu extraction needs an LLM review for ${programId}.`);
+  }
 
   const imageDataUrl = `data:${source.imageContentType};base64,${source.imageBytes.toString("base64")}`;
-  let candidate = await extract(imageDataUrl, source.month);
+  let candidate = await extract(imageDataUrl, source.month, program.name);
   let validationErrors = validateMenu(candidate, source.month);
-  if (validationErrors.length) throw new Error(`Extraction failed validation:\n- ${validationErrors.join("\n- ")}`);
+  if (validationErrors.length) throw new Error(`[${programId}] Extraction failed validation:\n- ${validationErrors.join("\n- ")}`);
 
-  let verdict = await review(imageDataUrl, candidate);
+  let verdict = await review(imageDataUrl, candidate, program.name);
   if (!verdict.approved || verdict.discrepancies.length) {
     const correction = `\n\nA verifier found these possible errors in an earlier attempt. Re-read the image and produce a corrected full transcription:\n${JSON.stringify(verdict.discrepancies, null, 2)}`;
-    candidate = await extract(imageDataUrl, source.month, correction);
+    candidate = await extract(imageDataUrl, source.month, program.name, correction);
     validationErrors = validateMenu(candidate, source.month);
-    if (validationErrors.length) throw new Error(`Corrected extraction failed validation:\n- ${validationErrors.join("\n- ")}`);
-    verdict = await review(imageDataUrl, candidate);
+    if (validationErrors.length) throw new Error(`[${programId}] Corrected extraction failed validation:\n- ${validationErrors.join("\n- ")}`);
+    verdict = await review(imageDataUrl, candidate, program.name);
   }
   if (!verdict.approved || verdict.discrepancies.length) {
-    throw new Error(`Independent review did not approve publication:\n${JSON.stringify(verdict, null, 2)}`);
+    throw new Error(`[${programId}] Independent review did not approve publication:\n${JSON.stringify(verdict, null, 2)}`);
   }
 
   const checkedAt = new Date().toISOString();
   const published = {
     schemaVersion: 1,
-    menuType: "elementary-lunch",
+    menuType: programId,
     month: candidate.month,
     title: candidate.title,
     sourcePageUrl: source.postUrl,
@@ -319,24 +376,66 @@ export async function updateMenu() {
     dailyNote: candidate.dailyNote,
     days: candidate.days.sort((a, b) => a.date.localeCompare(b.date))
   };
-  await writePublishedFiles(published, source.imageBytes, asset.filePath);
-  console.log(`Published ${published.title} from ${source.imageUrl}`);
+
+  await mkdir(SOURCE_DIRECTORY, { recursive: true });
+  await writeFile(asset.filePath, source.imageBytes);
+
+  const archiveDir = `${ARCHIVE_DIRECTORY}/${programId}`;
+  await mkdir(archiveDir, { recursive: true });
+  await writeFile(`${archiveDir}/${published.month}.json`, JSON.stringify(published, null, 2) + "\n");
+
+  if (!currentData.programs) currentData.programs = {};
+  currentData.programs[programId] = published;
+  currentData.updatedAt = checkedAt;
+  if (programId === "elementary-standard") {
+    Object.assign(currentData, published);
+  }
+
+  await writeFile(CURRENT_MENU_PATH, JSON.stringify(currentData, null, 2) + "\n");
+  console.log(`[${programId}] Published ${published.title} from ${source.imageUrl}`);
   return true;
+}
+
+export async function updateMenu(targetProgramId) {
+  if (targetProgramId) {
+    return updateProgramMenu(targetProgramId);
+  }
+  let anyUpdated = false;
+  for (const program of PROGRAMS) {
+    try {
+      const updated = await updateProgramMenu(program.id);
+      if (updated) anyUpdated = true;
+    } catch (err) {
+      console.error(`Error updating program ${program.id}:`, err.message);
+      throw err; // Fail closed
+    }
+  }
+  return anyUpdated;
 }
 
 const command = process.argv[2];
 if (command === "discover") {
-  const source = await discoverSource();
+  const programId = process.argv[3] || "elementary-standard";
+  const source = await discoverSource(programId);
   console.log(JSON.stringify({ ...source, imageBytes: undefined }, null, 2));
 } else if (command === "validate") {
   const path = process.argv[3] || CURRENT_MENU_PATH;
   const menu = JSON.parse(await readFile(path, "utf8"));
-  const errors = validateMenu(menu);
-  if (errors.length) throw new Error(`Menu validation failed:\n- ${errors.join("\n- ")}`);
-  console.log(`Valid menu: ${menu.month} with ${menu.days.length} weekdays.`);
+  if (menu.programs) {
+    for (const [id, prog] of Object.entries(menu.programs)) {
+      const errors = validateMenu(prog);
+      if (errors.length) throw new Error(`Menu validation failed for ${id}:\n- ${errors.join("\n- ")}`);
+      console.log(`Valid menu for ${id}: ${prog.month} with ${prog.days.length} weekdays.`);
+    }
+  } else {
+    const errors = validateMenu(menu);
+    if (errors.length) throw new Error(`Menu validation failed:\n- ${errors.join("\n- ")}`);
+    console.log(`Valid menu: ${menu.month} with ${menu.days.length} weekdays.`);
+  }
 } else if (command === "update") {
-  await updateMenu();
+  const targetProgramId = process.argv[3];
+  await updateMenu(targetProgramId);
 } else if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  console.error("Usage: node scripts/menu-pipeline.mjs <discover|validate|update> [file]");
+  console.error("Usage: node scripts/menu-pipeline.mjs <discover|validate|update> [programId|file]");
   process.exitCode = 1;
 }
