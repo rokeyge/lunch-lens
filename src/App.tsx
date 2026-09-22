@@ -44,6 +44,17 @@ type CurrentData = {
 
 const currentData = currentDataJson as unknown as CurrentData;
 
+const schoolExists = (schoolId: string | null): schoolId is string =>
+  schoolId !== null && SCHOOLS.some((school) => school.id === schoolId);
+
+const getInitialSchoolId = () => {
+  const schoolFromUrl = new URL(window.location.href).searchParams.get("school");
+  if (schoolExists(schoolFromUrl)) return schoolFromUrl;
+
+  const savedSchool = localStorage.getItem("lunchbox-school");
+  return schoolExists(savedSchool) ? savedSchool : DEFAULT_SCHOOL_ID;
+};
+
 function MealCard({ meal, today, outsideMonth }: { meal?: MenuDay; today: boolean; outsideMonth: boolean }) {
   const date = meal?.date ?? "";
   const { weekday, day } = date ? dateParts(date) : { weekday: "", day: 0 };
@@ -88,7 +99,7 @@ export default function App() {
   const today = localDateKey();
   const relevantSchoolDate = getRelevantSchoolDate(today);
 
-  const [schoolId, setSchoolId] = useState(() => localStorage.getItem("lunchbox-school") || DEFAULT_SCHOOL_ID);
+  const [schoolId, setSchoolId] = useState(getInitialSchoolId);
   const selectedSchool = useMemo(() => getSchool(schoolId), [schoolId]);
 
   const activeMenu: MenuProgram = useMemo(() => {
@@ -154,6 +165,26 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    localStorage.setItem("lunchbox-school", schoolId);
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("school") !== schoolId) {
+      url.searchParams.set("school", schoolId);
+      window.history.replaceState(window.history.state, "", url);
+    }
+  }, [schoolId]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const schoolFromUrl = new URL(window.location.href).searchParams.get("school");
+      if (schoolExists(schoolFromUrl)) setSchoolId(schoolFromUrl);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  useEffect(() => {
     setSelectedMobileDate((prev) => {
       if (displayedWeek.includes(prev)) return prev;
       return getInitialDayForWeek(displayedWeek, relevantSchoolDate, mealsByDate);
@@ -162,7 +193,6 @@ export default function App() {
 
   const handleSchoolChange = (newSchoolId: string) => {
     setSchoolId(newSchoolId);
-    localStorage.setItem("lunchbox-school", newSchoolId);
     const newSchool = getSchool(newSchoolId);
     const newMenu: MenuProgram = currentData.programs?.[newSchool.programId] ?? currentData;
     const newWeeks = buildWeeks(newMenu.month);

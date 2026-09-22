@@ -12,7 +12,7 @@ Live site: https://rokeyge.github.io/lunch-lens/
   - District middle schools (Abbott, Borel, Bowditch, Bayside 6–8)
   - Special 6–8 programs (Fiesta Gardens, North Shoreview, Parkside)
   - Preschool (Turnbull Child Development Center)
-- **School Selector**: Choosing a school switches the menu to the accurate district program and persists across visits.
+- **School Selector**: Choosing a school switches the menu to the accurate district program, persists across visits, and updates the shareable `school` URL parameter.
 - **Modern Mobile & Desktop Layout**:
   - Phone: Compact 5-day pill row with the selected day expanded below (zero horizontal scrolling!).
   - Desktop: Full 5-day week row side-by-side.
