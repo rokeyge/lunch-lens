@@ -257,10 +257,13 @@ export function validateMenu(menu, expectedMonth = menu.month) {
 }
 
 const GEMINI_API_KEY = process.env.LUNCH_KEY || process.env.GEMINI_API_KEY;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
-const MODEL = GEMINI_API_KEY ? GEMINI_MODEL : OPENAI_MODEL;
+const MODEL = GEMINI_MODEL;
+const MAX_API_ATTEMPTS = 4;
+
+const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+const isRetryableStatus = (status) => status === 429 || status >= 500;
 
 function toGeminiSchema(schema) {
   if (!schema || typeof schema !== "object") return schema;
@@ -286,77 +289,53 @@ function toGeminiSchema(schema) {
 const callGemini = async ({ schema, instructions, prompt, imageBytes, imageContentType }) => {
   const geminiSchema = toGeminiSchema(schema);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: instructions }]
-      },
-      contents: [
-        {
-          parts: [
-            {
-              inlineData: {
-                mimeType: imageContentType,
-                data: imageBytes.toString("base64")
-              }
-            },
-            { text: prompt }
-          ]
+  for (let attempt = 1; attempt <= MAX_API_ATTEMPTS; attempt += 1) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: instructions }]
+        },
+        contents: [
+          {
+            parts: [
+              {
+                inlineData: {
+                  mimeType: imageContentType,
+                  data: imageBytes.toString("base64")
+                }
+              },
+              { text: prompt }
+            ]
+          }
+        ],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: geminiSchema,
+          temperature: 0.1
         }
-      ],
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: geminiSchema,
-        temperature: 0.1
-      }
-    })
-  });
-  const body = await response.json();
-  if (!response.ok) {
-    throw new Error(`Gemini API error ${response.status}: ${body.error?.message || JSON.stringify(body)}`);
-  }
-  const text = body.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error(`Gemini response did not contain content text: ${JSON.stringify(body)}`);
-  return JSON.parse(text);
-};
+      })
+    });
+    const body = await response.json();
+    if (response.ok) {
+      const text = body.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error(`Gemini response did not contain content text: ${JSON.stringify(body)}`);
+      return JSON.parse(text);
+    }
 
-const callOpenAI = async ({ name, schema, instructions, prompt, imageBytes, imageContentType }) => {
-  const imageDataUrl = `data:${imageContentType};base64,${imageBytes.toString("base64")}`;
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${OPENAI_API_KEY}`,
-      "content-type": "application/json"
-    },
-    body: JSON.stringify({
-      model: OPENAI_MODEL,
-      store: false,
-      instructions,
-      input: [{
-        role: "user",
-        content: [
-          { type: "input_text", text: prompt },
-          { type: "input_image", image_url: imageDataUrl, detail: "high" }
-        ]
-      }],
-      text: { format: { type: "json_schema", name, strict: true, schema } }
-    })
-  });
-  const body = await response.json();
-  if (!response.ok) throw new Error(`OpenAI API error ${response.status}: ${body.error?.message || JSON.stringify(body)}`);
-  return JSON.parse(outputText(body));
+    const message = `Gemini API error ${response.status}: ${body.error?.message || JSON.stringify(body)}`;
+    if (!isRetryableStatus(response.status) || attempt === MAX_API_ATTEMPTS) throw new Error(message);
+
+    const delay = 2 ** (attempt - 1) * 5_000;
+    console.warn(`${message} Retrying in ${delay / 1000}s (${attempt}/${MAX_API_ATTEMPTS})...`);
+    await wait(delay);
+  }
 };
 
 const callStructured = async (args) => {
-  if (GEMINI_API_KEY) {
-    return callGemini(args);
-  }
-  if (OPENAI_API_KEY) {
-    return callOpenAI(args);
-  }
-  throw new Error("LUNCH_KEY (Google AI Studio / Gemini) or OPENAI_API_KEY is required for menu extraction.");
+  if (GEMINI_API_KEY) return callGemini(args);
+  throw new Error("LUNCH_KEY (Google AI Studio / Gemini) is required for menu extraction.");
 };
 
 const extract = ({ imageBytes, imageContentType, month, programName, correction = "" }) => callStructured({
@@ -414,8 +393,8 @@ export async function updateProgramMenu(programId, force = process.env.FORCE_MEN
     return false;
   }
 
-  if (!GEMINI_API_KEY && !OPENAI_API_KEY) {
-    throw new Error(`LUNCH_KEY (Gemini) or OPENAI_API_KEY is required when a new or forced menu extraction needs an LLM review for ${programId}.`);
+  if (!GEMINI_API_KEY) {
+    throw new Error(`LUNCH_KEY (Gemini) is required when a new or forced menu extraction needs an LLM review for ${programId}.`);
   }
 
   const { imageBytes, imageContentType } = source;

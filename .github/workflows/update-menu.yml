@@ -36,7 +36,6 @@ jobs:
         env:
           LUNCH_KEY: ${{ secrets.LUNCH_KEY }}
           GEMINI_API_KEY: ${{ secrets.LUNCH_KEY }}
-          OPENAI_API_KEY: ${{ secrets.APIKEY }}
           FORCE_MENU_UPDATE: ${{ inputs.force && 'true' || 'false' }}
         run: npm run menu:update
 
