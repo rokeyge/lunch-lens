@@ -120,22 +120,26 @@ export default function App() {
   const [schoolId, setSchoolId] = useState(getInitialSchoolId);
   const selectedSchool = useMemo(() => getSchool(schoolId), [schoolId]);
   const availableMenus = useMemo(() => menusForProgram(selectedSchool.programId), [selectedSchool.programId]);
-  const [selectedMonth, setSelectedMonth] = useState(() =>
-    defaultMenuForDate(menusForProgram(getSchool(getInitialSchoolId()).programId), today).month
-  );
-
-  const activeMenu: MenuProgram = useMemo(() => {
-    return availableMenus.find((menu) => menu.month === selectedMonth) ?? defaultMenuForDate(availableMenus, today);
-  }, [availableMenus, selectedMonth, today]);
-
-  const weeks = useMemo(() => buildWeeks(activeMenu.month), [activeMenu.month]);
+  const weeks = useMemo(() => {
+    const byMonday = new Map<string, string[]>();
+    for (const menu of availableMenus) {
+      for (const week of buildWeeks(menu.month)) byMonday.set(week[0], week);
+    }
+    return Array.from(byMonday.values()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [availableMenus]);
   const matchingWeek = weeks.findIndex((week) => week.includes(relevantSchoolDate));
-  const currentWeek = matchingWeek >= 0 ? matchingWeek : relevantSchoolDate < `${activeMenu.month}-01` ? 0 : weeks.length - 1;
+  const currentWeek = matchingWeek >= 0 ? matchingWeek : relevantSchoolDate < weeks[0][0] ? 0 : weeks.length - 1;
 
   const [view, setView] = useState<"week" | "month">("week");
   const [weekIndex, setWeekIndex] = useState(currentWeek);
   const [vegetarianOnly, setVegetarianOnly] = useState(false);
-  const mealsByDate = useMemo(() => new Map(activeMenu.days.map((meal) => [meal.date, meal])), [activeMenu.days]);
+  const mealsByDate = useMemo(() => new Map(
+    availableMenus.flatMap((menu) => menu.days).map((meal) => [meal.date, meal])
+  ), [availableMenus]);
+  const displayedWeek = weeks[weekIndex] || weeks[0];
+  const displayedMonth = displayedWeek[Math.floor(displayedWeek.length / 2)].slice(0, 7);
+  const activeMenu = availableMenus.find((menu) => menu.month === displayedMonth)
+    ?? defaultMenuForDate(availableMenus, displayedWeek[0]);
 
   // Ensure weekIndex stays strictly within valid bounds if program week count changes
   useEffect(() => {
@@ -171,8 +175,6 @@ export default function App() {
       window.removeEventListener("beforeinstallprompt", handlePrompt);
     };
   }, []);
-
-  const displayedWeek = weeks[weekIndex] || weeks[0];
 
   const [selectedMobileDate, setSelectedMobileDate] = useState(() =>
     getInitialDayForWeek(displayedWeek, relevantSchoolDate, mealsByDate)
@@ -216,25 +218,13 @@ export default function App() {
   const handleSchoolChange = (newSchoolId: string) => {
     setSchoolId(newSchoolId);
     const newSchool = getSchool(newSchoolId);
-    const newMenu = defaultMenuForDate(menusForProgram(newSchool.programId), today);
-    setSelectedMonth(newMenu.month);
-    const newWeeks = buildWeeks(newMenu.month);
-    if (newMenu.month !== activeMenu.month) {
-      const newMatching = newWeeks.findIndex((w) => w.includes(relevantSchoolDate));
-      const newCurrent = newMatching >= 0 ? newMatching : relevantSchoolDate < `${newMenu.month}-01` ? 0 : newWeeks.length - 1;
-      setWeekIndex(newCurrent);
-    } else {
-      setWeekIndex((prev) => Math.max(0, Math.min(prev, newWeeks.length - 1)));
+    const newWeeksByMonday = new Map<string, string[]>();
+    for (const menu of menusForProgram(newSchool.programId)) {
+      for (const week of buildWeeks(menu.month)) newWeeksByMonday.set(week[0], week);
     }
-  };
-
-  const handleMonthChange = (month: string) => {
-    const newMenu = availableMenus.find((menu) => menu.month === month);
-    if (!newMenu) return;
-    setSelectedMonth(month);
-    const newWeeks = buildWeeks(newMenu.month);
+    const newWeeks = Array.from(newWeeksByMonday.values()).sort((a, b) => a[0].localeCompare(b[0]));
     const newMatching = newWeeks.findIndex((week) => week.includes(relevantSchoolDate));
-    setWeekIndex(newMatching >= 0 ? newMatching : relevantSchoolDate < `${newMenu.month}-01` ? 0 : newWeeks.length - 1);
+    setWeekIndex(newMatching >= 0 ? newMatching : relevantSchoolDate < newWeeks[0][0] ? 0 : newWeeks.length - 1);
   };
 
   const changeView = (value: "week" | "month") => {
@@ -259,9 +249,13 @@ export default function App() {
     ? meal.choices.filter((choice) => choice.vegetarian)
     : meal.choices;
 
-  const monthLabel = formatMonth(activeMenu.month);
+  const firstMenuMonth = availableMenus[0].month;
+  const lastMenuMonth = availableMenus.at(-1)?.month ?? firstMenuMonth;
+  const monthLabel = view === "month" && firstMenuMonth !== lastMenuMonth
+    ? `${formatMonth(firstMenuMonth)} – ${formatMonth(lastMenuMonth)}`
+    : formatMonth(activeMenu.month);
   const currentMonthKey = today.slice(0, 7);
-  const isFutureMonthUnavailable = currentMonthKey > activeMenu.month;
+  const isFutureMonthUnavailable = currentMonthKey > lastMenuMonth;
 
   const selectedMobileMeal = mealsByDate.get(selectedMobileDate);
   const selectedMobileMealFiltered = selectedMobileMeal
@@ -390,16 +384,6 @@ export default function App() {
           <span>Selected School</span>
           <strong>{selectedSchool.name}</strong>
           <small>{activeMenu.title}</small>
-          {availableMenus.length > 1 && (
-            <label className="month-selector">
-              <span className="visually-hidden">Select menu month</span>
-              <select value={activeMenu.month} onChange={(event) => handleMonthChange(event.target.value)}>
-                {availableMenus.map((menu) => (
-                  <option value={menu.month} key={menu.month}>{formatMonth(menu.month)}</option>
-                ))}
-              </select>
-            </label>
-          )}
         </div>
       </section>
 
@@ -494,7 +478,7 @@ export default function App() {
                 <MealCard
                   meal={selectedMobileMealFiltered ?? { date: selectedMobileDate, status: "service", choices: [] }}
                   today={selectedMobileDate === today}
-                  outsideMonth={!selectedMobileDate.startsWith(activeMenu.month)}
+                  outsideMonth={!mealsByDate.has(selectedMobileDate)}
                 />
               </div>
             </div>
@@ -508,7 +492,7 @@ export default function App() {
                   <MealCard
                     meal={filtered ?? { date, status: "service", choices: [] }}
                     today={date === today}
-                    outsideMonth={!date.startsWith(activeMenu.month)}
+                    outsideMonth={!mealsByDate.has(date)}
                     key={date}
                   />
                 );
@@ -529,7 +513,7 @@ export default function App() {
             {weeks.flat().map((date) => {
               const meal = mealsByDate.get(date);
               const choices = meal ? visibleChoices(meal).slice().sort((a, b) => Number(a.vegetarian) - Number(b.vegetarian)) : [];
-              const outside = !date.startsWith(activeMenu.month);
+              const outside = !mealsByDate.has(date);
               return (
                 <article
                   className={`calendar-cell ${outside ? "outside" : ""} ${date === today ? "current" : ""}`}
