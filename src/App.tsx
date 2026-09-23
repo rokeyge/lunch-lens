@@ -97,7 +97,6 @@ function MealCard({ meal, today, outsideMonth }: { meal?: MenuDay; today: boolea
             const displayName = cleanMealName(choice.name);
             return (
               <div className={`choice ${choice.vegetarian ? "veg-choice" : ""}`} key={`${index}-${choice.name}`}>
-                <span className="choice-number">{index + 1}</span>
                 <h3>
                   {displayName}
                   {choice.vegetarian && (
@@ -328,10 +327,11 @@ export default function App() {
     <main id="top">
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Lunchbox SMFC home">
-          <span className="brand-mark">L</span>
+          <span className="brand-mark" aria-hidden="true">✳</span>
           <span>Lunchbox <em>SMFC</em></span>
         </a>
         <div className="school-selector-wrap">
+          <span className="school-caption">Your school</span>
           <label htmlFor="school-select" className="visually-hidden">Select School</label>
           <select
             id="school-select"
@@ -344,7 +344,7 @@ export default function App() {
               <optgroup key={category} label={category}>
                 {schools.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name} ({s.grades})
+                    {s.name}
                   </option>
                 ))}
               </optgroup>
@@ -353,7 +353,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className={`freshness-bar-container ${isFutureMonthUnavailable ? "is-warning" : "is-standard"}`}>
+      {isFutureMonthUnavailable && <div className="freshness-bar-container is-warning">
         {isFutureMonthUnavailable ? (
           <aside className="freshness-banner warning" role="status">
             <span>{formatMonth(currentMonthKey)} menu has not been processed yet</span>
@@ -373,17 +373,11 @@ export default function App() {
             </a>
           </aside>
         )}
-      </div>
+      </div>}
 
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">{monthLabel} · Lunch Menu</p>
           <h1>What’s for lunch?</h1>
-        </div>
-        <div className="menu-context">
-          <span>Selected School</span>
-          <strong>{selectedSchool.name}</strong>
-          <small>{activeMenu.title}</small>
         </div>
       </section>
 
@@ -475,6 +469,9 @@ export default function App() {
               </div>
 
               <div id="mobile-day-panel" className="mobile-expanded-card" role="tabpanel" aria-labelledby={`mobile-tab-${selectedMobileDate}`}>
+                <div className="lunch-heading">
+                  <h2>{selectedMobileDate === today ? "Today’s lunch" : `${new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: "UTC" }).format(new Date(`${selectedMobileDate}T12:00:00Z`))}’s lunch`}<span aria-hidden="true">.</span></h2>
+                </div>
                 <MealCard
                   meal={selectedMobileMealFiltered ?? { date: selectedMobileDate, status: "service", choices: [] }}
                   today={selectedMobileDate === today}
@@ -548,20 +545,23 @@ export default function App() {
           </div>
         )}
 
-        <p className="daily-note">
-          <span><strong>Daily:</strong> {activeMenu.dailyNote}</span>
-          <span id="vegetarian-note"><span className="veg-key" aria-hidden="true">V</span> District-marked vegetarian choice</span>
-        </p>
+        <p className="menu-legend" id="vegetarian-note"><span className="veg-key" aria-hidden="true">V</span> Vegetarian options in green</p>
       </section>
 
-      <section className="safety-note">
+      <div className="quiet-footer">
+      <details className="menu-details">
+        <summary>About the menu</summary>
+        <p>An unofficial guide to SMFCSD lunch.</p>
+        <p><strong>Daily options:</strong> {activeMenu.dailyNote}</p>
         <p>
           <strong>Allergies:</strong> This is an unofficial transcription, not allergy guidance. Ingredients and substitutions can change; contact your school or Child Nutrition Services.
         </p>
-        <a href={`${import.meta.env.BASE_URL}${activeMenu.sourceImagePath}`} target="_blank" rel="noreferrer">
-          Original district menu <span aria-hidden="true">↗</span>
-        </a>
-      </section>
+        {availableMenus.map((menu) => (
+          <p key={menu.month}><a href={`${import.meta.env.BASE_URL}${menu.sourceImagePath}`} target="_blank" rel="noreferrer">
+            {formatMonth(menu.month)} district menu ↗
+          </a> · Checked {formatCheckedAt(menu.checkedAt)}</p>
+        ))}
+      </details>
 
       {!isStandalone && (
         <div className="install-banner-wrap">
@@ -571,16 +571,12 @@ export default function App() {
             onClick={handleOpenInstall}
             aria-label={isMobile ? "Add Lunchbox shortcut to your phone home screen" : "Add Lunchbox shortcut to your computer desktop"}
           >
-            <span aria-hidden="true" className="save-icon">{isMobile ? "📱" : "💻"}</span>
-            <span className="save-label">{isMobile ? "Add Lunchbox to Phone" : "Add Lunchbox to Desktop"}</span>
+            <span className="save-label">Save to home screen ↗</span>
           </button>
         </div>
       )}
 
-      <footer>
-        <span>Transcribed from the SMFCSD {monthLabel} menu.</span>
-        <span>Checked {formatCheckedAt(activeMenu.checkedAt)} · {activeMenu.automated ? "Automated check" : "Verified transcription"}</span>
-      </footer>
+      </div>
 
       <InstallModal
         isOpen={showInstallModal}

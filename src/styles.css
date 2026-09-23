@@ -13,6 +13,40 @@
   --warning-text: #704800;
 }
 
+.menu-legend {
+  margin: 16px 0 0;
+  color: var(--green);
+  font-size: 12px;
+}
+.menu-details {
+  max-width: 1132px;
+  margin: 0 auto 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.menu-details summary { cursor: pointer; color: var(--ink); }
+.menu-details a { color: var(--green); }
+.install-banner-wrap .save-app-btn {
+  width: auto;
+  padding: 8px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 1180px) {
+  .menu-details { margin-left: 24px; margin-right: 24px; }
+}
+@media (max-width: 760px) {
+  .menu-details { margin-left: 16px; margin-right: 16px; }
+}
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; background: var(--cream); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -177,7 +211,7 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
 .hero {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 38px 24px 30px;
+  padding: 28px 24px 24px;
   display: grid;
   grid-template-columns: 1.4fr 0.85fr;
   gap: 40px;
@@ -195,7 +229,7 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
   margin: 0;
   max-width: 650px;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(40px, 5.5vw, 76px);
+  font-size: clamp(32px, 4vw, 46px);
   line-height: 0.95;
   letter-spacing: -0.04em;
   font-weight: 500;
@@ -231,7 +265,7 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
 .content-shell {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 24px 60px;
+  padding: 0 24px 20px;
 }
 
 .toolbar {
@@ -405,7 +439,7 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
   min-height: 64px;
   padding: 12px 0;
   display: grid;
-  grid-template-columns: 24px 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   align-items: start;
   border-bottom: 1px solid var(--line);
@@ -597,37 +631,54 @@ footer {
   font-size: 12px;
 }
 
+.school-caption { display: none; }
+.lunch-heading { margin: 22px 0 18px; }
+.lunch-heading h2 { font-family: Georgia, serif; font-size: 36px; font-weight: 400; letter-spacing: -.04em; margin: 5px 0; }
+.lunch-heading h2 span { color: var(--coral); }
+.lunch-heading p { color: var(--muted); margin: 0; font-size: 12px; }
+.quiet-footer { max-width: 1132px; margin: 0 auto; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; border-top: 1px solid var(--line); }
+.quiet-footer .menu-details { margin: 0; border: 0; flex: 1; }
+.quiet-footer .install-banner-wrap { margin: 0; padding: 0; }
+.quiet-footer .save-app-btn { text-decoration: none; padding: 12px 0; }
+@media (max-width: 1180px) { .quiet-footer { margin: 0 24px; } }
+
 /* Responsive Styles for Phone */
 @media (max-width: 760px) {
   .topbar {
     height: auto;
     padding: 10px 16px;
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: space-between;
     gap: 12px;
   }
   .brand {
-    font-size: 17.5px;
+    font-size: 14px;
+    gap: 7px;
     flex-shrink: 0;
   }
   .brand-mark {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
+    width: 22px;
+    height: 22px;
+    font-size: 21px;
+    background: transparent;
+    color: var(--coral);
     border-radius: 8px 8px 12px 8px;
   }
   .school-selector-wrap {
     flex: 1;
-    max-width: 220px;
+    max-width: none;
     min-width: 0;
   }
   .school-select {
     width: 100%;
-    padding: 6px 10px;
-    font-size: 13px;
-    border-radius: 8px;
+    padding: 4px 22px 4px 0;
+    font-size: 17px;
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
     text-overflow: ellipsis;
   }
 
@@ -644,7 +695,7 @@ footer {
 
   /* Compact content shell with zero wasted top padding */
   .content-shell {
-    padding: 10px 16px 36px;
+    padding: 4px 16px 12px;
   }
 
   /* Sleek, non-wrapping toolbar */
@@ -745,29 +796,39 @@ footer {
   }
   .mobile-day-tabs {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 6px;
     margin-bottom: 10px;
   }
   .mobile-day-tab {
-    padding: 8px 3px 6px;
+    min-width: 0;
+    padding: 10px 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    box-shadow: none;
     border-radius: 10px;
   }
   .mobile-day-tab .day-name {
     font-size: 10.5px;
   }
   .mobile-day-tab .day-num {
-    font-size: 16px;
+    font-size: 20px;
+    font-weight: 600;
   }
   .mobile-day-tab.is-closed {
     opacity: 0.7;
-    background: #f4f0e6;
+    background: transparent;
   }
   .mobile-day-tab.selected {
     background: var(--green);
     border-color: var(--green);
     color: white;
-    box-shadow: 0 3px 10px rgba(20, 92, 76, 0.2);
+    box-shadow: none;
   }
   .mobile-day-tab.selected .day-name {
     color: #d1ecdf;
@@ -778,21 +839,28 @@ footer {
 
   /* Mobile expanded meal card */
   .mobile-expanded-card .meal-card {
-    border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(19, 56, 50, 0.05);
+    border-radius: 3px 3px 16px 3px;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--coral);
+    box-shadow: 0 4px 12px rgba(19, 56, 50, 0.035);
   }
   .mobile-expanded-card .meal-date {
-    min-height: 48px;
-    padding: 8px 14px;
+    display: none;
   }
   .mobile-expanded-card .meal-date strong {
     font-size: 20px;
   }
   .mobile-expanded-card .choice {
-    padding: 12px 14px;
+    min-height: 0;
+    padding: 16px 0;
   }
+  .mobile-expanded-card .choices { padding: 0 14px; }
+  .mobile-expanded-card .meal-card { min-height: 0; }
+  .menu-legend { margin-top: 10px; font-size: 11px; }
+  .menu-details { padding: 10px 0; margin-bottom: 0; }
   .mobile-expanded-card .choice h3 {
-    font-size: 15px;
+    font-size: 19px;
+    overflow-wrap: anywhere;
   }
 
   .calendar {
@@ -803,6 +871,8 @@ footer {
     font-size: 10px;
   }
   .calendar-cell {
+    min-width: 0;
+    overflow-wrap: anywhere;
     min-height: 130px;
     padding: 6px 4px;
   }
@@ -820,6 +890,13 @@ footer {
     display: none;
   }
 
+  .toolbar { flex-wrap: wrap; }
+  .menu-details { overflow-wrap: anywhere; }
+  .mobile-expanded-card, .mobile-week-container { min-width: 0; max-width: 100%; }
+  .quiet-footer { margin: 0 16px; gap: 12px; font-size: 12px; }
+  .quiet-footer .menu-details { font-size: 12px; }
+  .quiet-footer .save-app-btn { font-size: 11px; }
+
   .daily-note {
     flex-direction: column;
     gap: 8px;
@@ -835,7 +912,7 @@ footer {
   }
 
   .install-banner-wrap {
-    margin: 4px auto 20px;
+    margin: 0 auto 4px;
     padding: 0 16px;
   }
   .save-app-btn {
@@ -848,6 +925,8 @@ footer {
 
   footer {
     margin: 0 16px;
+    padding-top: 10px;
+    padding-bottom: 16px;
     padding-left: 0;
     padding-right: 0;
     flex-direction: column;
