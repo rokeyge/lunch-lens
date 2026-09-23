@@ -1,0 +1,237 @@
+/* The pre-redesign look, selected with ?design=classic. Shared layout and menu behavior stay in styles.css. */
+html[data-design="classic"] {
+  --ink: #133832;
+  --muted: #4a5c57;
+  --cream: #f7f3e8;
+  --paper: #fffdf7;
+  --green: #145c4c;
+  --mint: #dceee5;
+  --coral: #9e3525;
+  --line: #d8ded6;
+}
+
+html[data-design="classic"] .topbar {
+  border-bottom: 1px solid rgba(19, 56, 50, .15);
+  background: rgba(247, 243, 232, .95);
+}
+html[data-design="classic"] .brand {
+  color: var(--ink);
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  transform: none;
+}
+html[data-design="classic"] .brand em { color: var(--green); }
+html[data-design="classic"] .brand-mark { background: var(--coral); }
+html[data-design="classic"] .school-select {
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 4px rgba(19, 56, 50, .04);
+}
+html[data-design="classic"] .hero h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 500;
+}
+html[data-design="classic"] .tabs { gap: 24px; padding-bottom: 0; }
+html[data-design="classic"] .tabs button {
+  padding: 14px 4px 12px;
+  border-radius: 0;
+  border-bottom: 3px solid transparent;
+}
+html[data-design="classic"] .tabs button.active {
+  border-bottom-color: var(--coral);
+  background: transparent;
+  box-shadow: none;
+}
+html[data-design="classic"] .meal-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(19, 56, 50, .035);
+}
+html[data-design="classic"] .meal-card.featured {
+  border-color: var(--green);
+  box-shadow: 0 8px 24px rgba(20, 92, 76, .14);
+}
+html[data-design="classic"] .meal-date {
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+html[data-design="classic"] .meal-date strong {
+  font-family: Georgia, serif;
+  font-weight: 500;
+}
+html[data-design="classic"] .featured .meal-date {
+  border-bottom: 0;
+  background: var(--green);
+}
+html[data-design="classic"] .choices {
+  display: block;
+  padding: 4px 14px 12px;
+}
+html[data-design="classic"] .choice {
+  min-height: 64px;
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+html[data-design="classic"] .choice:last-child { border-bottom: 0; }
+html[data-design="classic"] .choice.veg-choice { background: transparent; }
+html[data-design="classic"] .choice h3 {
+  color: var(--coral);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15.5px;
+  font-weight: 500;
+}
+html[data-design="classic"] .choice.veg-choice h3 { color: var(--green); }
+html[data-design="classic"] .calendar {
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  background: var(--paper);
+}
+html[data-design="classic"] .calendar-heading {
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+html[data-design="classic"] .calendar-cell {
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+html[data-design="classic"] .calendar-cell.current {
+  background: #f0f8f3;
+  box-shadow: inset 0 0 0 2px var(--green);
+}
+html[data-design="classic"] .calendar-cell p { font-family: Georgia, serif; }
+html[data-design="classic"] .lunch-heading h2 {
+  font-family: Georgia, serif;
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: -.04em;
+}
+
+@media (max-width: 760px) {
+  html[data-design="classic"] .topbar {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(19, 56, 50, .15);
+    border-radius: 0;
+    position: sticky;
+    background: rgba(247, 243, 232, .95);
+    backdrop-filter: blur(12px);
+  }
+  html[data-design="classic"] .brand {
+    align-self: auto;
+    padding: 0;
+    background: transparent;
+    color: var(--ink);
+    border-radius: 0;
+    transform: none;
+  }
+  html[data-design="classic"] .brand-mark {
+    width: 22px;
+    height: 22px;
+    font-size: 21px;
+    background: transparent;
+    color: var(--coral);
+  }
+  html[data-design="classic"] .school-select {
+    font-size: 17px;
+    font-weight: 600;
+  }
+  html[data-design="classic"] .content-shell { padding: 4px 16px 12px; }
+  html[data-design="classic"] .tabs {
+    gap: 2px;
+    padding: 3px;
+  }
+  html[data-design="classic"] .tabs button {
+    padding: 5px 12px;
+    border: 0;
+    border-radius: 7px;
+  }
+  html[data-design="classic"] .tabs button.active {
+    background: var(--paper);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+  }
+  html[data-design="classic"] .mobile-day-tab {
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+  }
+  html[data-design="classic"] .mobile-day-tab.selected {
+    border-color: var(--green);
+    background: var(--green);
+    box-shadow: none;
+    transform: none;
+  }
+  html[data-design="classic"] .mobile-day-tab.selected .day-name { color: #d1ecdf; }
+  html[data-design="classic"] .mobile-expanded-card .meal-card {
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--coral);
+    border-radius: 3px 3px 16px 3px;
+    background: var(--paper);
+    box-shadow: 0 4px 12px rgba(19, 56, 50, .035);
+    overflow: hidden;
+  }
+  html[data-design="classic"] .mobile-expanded-card .choices {
+    display: block;
+    padding: 0 14px;
+  }
+  html[data-design="classic"] .mobile-expanded-card .choice {
+    min-height: 0;
+    padding: 16px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  html[data-design="classic"] .mobile-expanded-card .choice:last-child { border-bottom: 0; }
+  html[data-design="classic"] .mobile-expanded-card .choice.veg-choice { background: transparent; }
+  html[data-design="classic"] .mobile-expanded-card .choice h3 {
+    color: var(--coral);
+    font-family: Georgia, serif;
+    font-size: 19px;
+    font-weight: 500;
+  }
+  html[data-design="classic"] .mobile-expanded-card .choice.veg-choice h3 { color: var(--green); }
+  html[data-design="classic"] .calendar {
+    margin: 0 -8px;
+    gap: 0;
+  }
+  html[data-design="classic"] .calendar-mobile-title,
+  html[data-design="classic"] .calendar-day-pick,
+  html[data-design="classic"] .calendar-dialog-backdrop,
+  html[data-design="classic"] .calendar-grid-hint { display: none; }
+  html[data-design="classic"] .calendar-heading {
+    padding: 8px 2px;
+    font-size: 10px;
+  }
+  html[data-design="classic"] .calendar-cell {
+    min-height: 130px;
+    padding: 6px 4px;
+    overflow-wrap: anywhere;
+    background: var(--paper);
+  }
+  html[data-design="classic"] .calendar-cell > .calendar-date { display: flex; }
+  html[data-design="classic"] .calendar-cell > small,
+  html[data-design="classic"] .calendar-cell > p,
+  html[data-design="classic"] .calendar-cell > .calendar-closed { display: block; }
+  html[data-design="classic"] .calendar-cell.outside { background: #f2efe7; }
+  html[data-design="classic"] .calendar-cell.current {
+    background: #f0f8f3;
+    box-shadow: inset 0 0 0 2px var(--green);
+  }
+  html[data-design="classic"] .calendar-cell p {
+    margin-bottom: 6px;
+    padding-left: 4px;
+    font-size: 11px;
+    line-height: 1.2;
+  }
+  html[data-design="classic"] .calendar-date {
+    margin-bottom: 6px;
+    font-size: 11px;
+  }
+  html[data-design="classic"] .calendar-date span { display: none; }
+}

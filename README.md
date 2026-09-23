@@ -69,8 +69,12 @@ Add your Gemini API key (Google AI Studio) as an Actions secret named `LUNCH_KEY
 
 `.github/workflows/pages.yml` builds and publishes the static site whenever a commit reaches `main`.
 
+To choose the design for the whole site, set the repository Actions variable `SITE_DESIGN` to `playful` or `classic` under **Settings → Secrets and variables → Actions → Variables**. If it is unset, the playful design is used. After changing it, open **Actions → Deploy to GitHub Pages → Run workflow** to rebuild and publish the site. This is a site-wide build setting, not a URL parameter or a visitor preference.
+
 Build the static output locally with:
 
 ```bash
 npm run build
 ```
+
+To preview the other design locally, run `VITE_SITE_DESIGN=classic npm run dev` (or use `playful`).

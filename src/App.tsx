@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import currentDataJson from "./data/current.json";
 import { SCHOOLS, DEFAULT_SCHOOL_ID, getSchool, School } from "./data/schools";
 import {
@@ -130,6 +130,7 @@ export default function App() {
   const currentWeek = matchingWeek >= 0 ? matchingWeek : relevantSchoolDate < weeks[0][0] ? 0 : weeks.length - 1;
 
   const [view, setView] = useState<"week" | "month">("week");
+  const todayCalendarRef = useRef<HTMLElement | null>(null);
   const [weekIndex, setWeekIndex] = useState(currentWeek);
   const [vegetarianOnly, setVegetarianOnly] = useState(false);
   const mealsByDate = useMemo(() => new Map(
@@ -178,6 +179,16 @@ export default function App() {
   const [selectedMobileDate, setSelectedMobileDate] = useState(() =>
     getInitialDayForWeek(displayedWeek, relevantSchoolDate, mealsByDate)
   );
+  const [selectedMonthDate, setSelectedMonthDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedMonthDate) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedMonthDate(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [selectedMonthDate]);
 
   useEffect(() => {
     const savedView = localStorage.getItem("lunchbox-view");
@@ -214,8 +225,17 @@ export default function App() {
     });
   }, [displayedWeek, relevantSchoolDate, mealsByDate]);
 
+  useEffect(() => {
+    if (view !== "month" || !window.matchMedia("(max-width: 760px)").matches) return;
+    const frame = window.requestAnimationFrame(() => {
+      todayCalendarRef.current?.scrollIntoView({ block: "center", behavior: "auto" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [view, selectedSchool.programId]);
+
   const handleSchoolChange = (newSchoolId: string) => {
     setSchoolId(newSchoolId);
+    setSelectedMonthDate(null);
     const newSchool = getSchool(newSchoolId);
     const newWeeksByMonday = new Map<string, string[]>();
     for (const menu of menusForProgram(newSchool.programId)) {
@@ -228,6 +248,7 @@ export default function App() {
 
   const changeView = (value: "week" | "month") => {
     setView(value);
+    setSelectedMonthDate(null);
     localStorage.setItem("lunchbox-view", value);
   };
 
@@ -260,6 +281,7 @@ export default function App() {
   const selectedMobileMealFiltered = selectedMobileMeal
     ? { ...selectedMobileMeal, choices: visibleChoices(selectedMobileMeal) }
     : undefined;
+  const selectedMonthMeal = selectedMonthDate ? mealsByDate.get(selectedMonthDate) : undefined;
 
   const schoolCategories = useMemo(() => {
     const groups = new Map<School["category"], School[]>();
@@ -497,6 +519,7 @@ export default function App() {
             </div>
           </div>
         ) : (
+          <>
           <div
             id="panel-range-month"
             role="tabpanel"
@@ -504,6 +527,7 @@ export default function App() {
             className="calendar"
             aria-label={`${monthLabel} lunch calendar`}
           >
+            <h2 className="calendar-mobile-title">{monthLabel}</h2>
             {(["Mon", "Tue", "Wed", "Thu", "Fri"] as const).map((day) => (
               <div className="calendar-heading" key={day} aria-hidden="true">{day}</div>
             ))}
@@ -513,13 +537,18 @@ export default function App() {
               const outside = !mealsByDate.has(date);
               return (
                 <article
-                  className={`calendar-cell ${outside ? "outside" : ""} ${date === today ? "current" : ""}`}
+                  className={`calendar-cell ${outside ? "outside" : ""} ${date === today ? "current" : ""} ${meal?.status === "no-school" ? "closed" : ""}`}
                   key={date}
+                  ref={date === today ? todayCalendarRef : undefined}
                   tabIndex={0}
                   aria-label={`${date}: ${outside ? "outside menu month" : meal?.status === "no-school" ? "no school" : choices.map((c) => cleanMealName(c.name)).join(", ")}`}
                 >
+                  {!outside && <button className="calendar-day-pick" type="button" onClick={() => setSelectedMonthDate(date)} aria-label={`View ${date} lunch menu`}>
+                    <strong>{dateParts(date).day === 1 && <small>{formatMonth(date.slice(0, 7)).slice(0, 3)} </small>}{dateParts(date).day}</strong>
+                    <span className="calendar-menu-mark" aria-hidden="true" />
+                  </button>}
                   <div className="calendar-date">
-                    {dateParts(date).day}
+                    <strong>{dateParts(date).day}</strong>
                     {date === today && <span>Today</span>}
                   </div>
                   {outside ? (
@@ -543,6 +572,28 @@ export default function App() {
               );
             })}
           </div>
+          <p className="calendar-grid-hint">Tap a date to see lunch. A red dash means no school.</p>
+          {selectedMonthDate && selectedMonthMeal && (
+            <div className="calendar-dialog-backdrop" onClick={() => setSelectedMonthDate(null)}>
+              <section className="calendar-dialog" role="dialog" aria-modal="true" aria-label={`${selectedMonthDate} lunch menu`} onClick={(event) => event.stopPropagation()}>
+                <button className="calendar-dialog-close" type="button" autoFocus onClick={() => setSelectedMonthDate(null)} aria-label="Close day menu">×</button>
+                <h2>{dateParts(selectedMonthDate).weekday}, {formatMonth(selectedMonthDate.slice(0, 7)).split(" ")[0]} {dateParts(selectedMonthDate).day}</h2>
+                {selectedMonthMeal.status === "no-school" ? (
+                  <p className="calendar-dialog-closed">No school · No lunch service</p>
+                ) : visibleChoices(selectedMonthMeal).length ? (
+                  <div className="calendar-dialog-choices">
+                    {visibleChoices(selectedMonthMeal).map((choice) => (
+                      <p className={choice.vegetarian ? "calendar-veg" : ""} key={choice.name}>
+                        {cleanMealName(choice.name)}
+                        {choice.vegetarian && <a className="veg-icon" href="#vegetarian-note" aria-label="District-marked vegetarian choice">V</a>}
+                      </p>
+                    ))}
+                  </div>
+                ) : <p>No vegetarian choices listed.</p>}
+              </section>
+            </div>
+          )}
+          </>
         )}
 
         <p className="menu-legend" id="vegetarian-note"><span className="veg-key" aria-hidden="true">V</span> Vegetarian options in green</p>
@@ -550,15 +601,16 @@ export default function App() {
 
       <div className="quiet-footer">
       <details className="menu-details">
-        <summary>About the menu</summary>
+        <summary>About, allergies &amp; original menus</summary>
         <p>An unofficial guide to SMFCSD lunch.</p>
         <p><strong>Daily options:</strong> {activeMenu.dailyNote}</p>
         <p>
-          <strong>Allergies:</strong> This is an unofficial transcription, not allergy guidance. Ingredients and substitutions can change; contact your school or Child Nutrition Services.
+          <strong>Allergy note:</strong> This is an unofficial transcription, not allergy guidance. Ingredients and substitutions can change; contact your school or Child Nutrition Services before relying on it for an allergy.
         </p>
+        <p><strong>Original district menus:</strong></p>
         {availableMenus.map((menu) => (
           <p key={menu.month}><a href={`${import.meta.env.BASE_URL}${menu.sourceImagePath}`} target="_blank" rel="noreferrer">
-            {formatMonth(menu.month)} district menu ↗
+            View {formatMonth(menu.month)} menu ↗
           </a> · Checked {formatCheckedAt(menu.checkedAt)}</p>
         ))}
       </details>
