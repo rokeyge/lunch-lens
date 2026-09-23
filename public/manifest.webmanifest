@@ -1,7 +1,7 @@
 {
   "id": "lunchbox-smfc",
-  "name": "Lunchbox SMFC",
-  "short_name": "Lunchbox",
+  "name": "School Lunch SMFC",
+  "short_name": "School Lunch SMFC",
   "description": "Readable, daily San Mateo–Foster City School District lunch menus.",
   "start_url": "./",
   "scope": "./",

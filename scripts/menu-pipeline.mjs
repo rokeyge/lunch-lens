@@ -179,7 +179,7 @@ export function discoverLunchImage(postHtml) {
 }
 
 const fetchBytes = async (url) => {
-  const response = await fetch(url, { headers: { "user-agent": "Lunchbox-SMFC/1.0 (+https://github.com/rokeyge/lunch-lens)" } });
+  const response = await fetch(url, { headers: { "user-agent": "School-Lunch-SMFC/1.0 (+https://github.com/rokeyge/lunch-lens)" } });
   if (!response.ok) throw new Error(`Request failed (${response.status}) for ${url}`);
   return { bytes: Buffer.from(await response.arrayBuffer()), contentType: response.headers.get("content-type") || "image/jpeg" };
 };

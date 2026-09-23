@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lunchbox-v2';
+const CACHE_NAME = 'school-lunch-v3';
 
 self.addEventListener('install', () => {
   self.skipWaiting();

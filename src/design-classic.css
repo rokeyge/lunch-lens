@@ -22,7 +22,6 @@ html[data-design="classic"] .brand {
   transform: none;
 }
 html[data-design="classic"] .brand em { color: var(--green); }
-html[data-design="classic"] .brand-mark { background: var(--coral); }
 html[data-design="classic"] .school-select {
   border: 1px solid var(--line);
   box-shadow: 0 1px 4px rgba(19, 56, 50, .04);
@@ -132,9 +131,7 @@ html[data-design="classic"] .lunch-heading h2 {
   html[data-design="classic"] .brand-mark {
     width: 22px;
     height: 22px;
-    font-size: 21px;
-    background: transparent;
-    color: var(--coral);
+    border-radius: 6px;
   }
   html[data-design="classic"] .school-select {
     font-size: 17px;

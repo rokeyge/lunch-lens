@@ -348,9 +348,9 @@ export default function App() {
   return (
     <main id="top">
       <header className="topbar">
-        <a className="brand" href="#top" aria-label="Lunchbox SMFC home">
-          <span className="brand-mark" aria-hidden="true">✳</span>
-          <span>Lunchbox <em>SMFC</em></span>
+        <a className="brand" href="#top" aria-label="School Lunch SMFC home">
+          <img className="brand-mark" src={`${import.meta.env.BASE_URL}icon.svg`} alt="" aria-hidden="true" />
+          <span>School Lunch <em>SMFC</em></span>
         </a>
         <div className="school-selector-wrap">
           <span className="school-caption">Your school</span>
@@ -621,7 +621,7 @@ export default function App() {
             type="button"
             className="save-app-btn bottom"
             onClick={handleOpenInstall}
-            aria-label={isMobile ? "Add Lunchbox shortcut to your phone home screen" : "Add Lunchbox shortcut to your computer desktop"}
+            aria-label={isMobile ? "Add School Lunch SMFC shortcut to your phone home screen" : "Add School Lunch SMFC shortcut to your computer desktop"}
           >
             <span className="save-label">Save to home screen ↗</span>
           </button>

@@ -102,15 +102,14 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
   transform: rotate(-2deg);
 }
 .brand em { color: #f4bd63; font-style: normal; }
+.brand > span { white-space: nowrap; }
 .brand-mark {
   width: 34px;
   height: 34px;
-  border-radius: 10px 10px 16px 10px;
-  display: grid;
-  place-items: center;
-  color: white;
-  background: var(--coral);
-  font-family: Georgia, serif;
+  display: block;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  object-fit: contain;
 }
 
 .install-banner-wrap {
@@ -681,11 +680,9 @@ footer {
     flex-shrink: 0;
   }
   .brand-mark {
-    width: 15px;
-    height: 17px;
-    font-size: 17px;
-    color: #ffe1ab;
-    border-radius: 8px 8px 12px 8px;
+    width: 21px;
+    height: 21px;
+    border-radius: 6px;
   }
   .school-selector-wrap {
     flex: 1;

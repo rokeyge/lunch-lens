@@ -85,8 +85,8 @@ test("menu-pipeline exports cleanMealName for ingestion normalization", async ()
 test("PWA manifest contains valid metadata and required icons", async () => {
   const { readFile, access } = await import("node:fs/promises");
   const manifest = JSON.parse(await readFile(new URL("../public/manifest.webmanifest", import.meta.url), "utf8"));
-  assert.equal(manifest.name, "Lunchbox SMFC");
-  assert.equal(manifest.short_name, "Lunchbox");
+  assert.equal(manifest.name, "School Lunch SMFC");
+  assert.equal(manifest.short_name, "School Lunch SMFC");
   assert.equal(manifest.display, "standalone");
   assert.ok(manifest.icons.length >= 3, "should have at least 3 icon definitions");
 
@@ -99,4 +99,3 @@ test("PWA manifest contains valid metadata and required icons", async () => {
     );
   }
 });
-

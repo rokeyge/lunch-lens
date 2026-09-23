@@ -82,7 +82,7 @@ export function InstallModal({
     if (canShare) {
       try {
         await navigator.share({
-          title: "Lunchbox SMFC",
+          title: "School Lunch SMFC",
           text: "San Mateo–Foster City School District lunch menus for parents",
           url: window.location.href,
         });
@@ -115,8 +115,8 @@ export function InstallModal({
 
         <div className="install-header">
           <img
-            src={`${import.meta.env.BASE_URL}apple-touch-icon.png`}
-            alt="Lunchbox icon"
+            src={`${import.meta.env.BASE_URL}icon.svg`}
+            alt="School Lunch SMFC icon"
             className="install-icon-img"
           />
           <div>
@@ -132,7 +132,7 @@ export function InstallModal({
             <button className="install-primary-btn" onClick={handleInstallClick}>
               ⚡️ Install App Now
             </button>
-            <p className="install-note">Adds Lunchbox directly to your device</p>
+            <p className="install-note">Adds School Lunch SMFC directly to your device</p>
           </div>
         ) : (
           <div className="quick-guide-box">
@@ -277,7 +277,7 @@ export function InstallModal({
                       <div className="step-title">
                         Tap <strong>Install app</strong> or <strong>Add to Home</strong>
                       </div>
-                      <span className="step-desc">Lunchbox icon will appear on your phone</span>
+                      <span className="step-desc">School Lunch SMFC icon will appear on your phone</span>
                     </div>
                   </div>
                 </>
@@ -301,7 +301,7 @@ export function InstallModal({
                       <div className="step-title">
                         Click <strong>Add to Dock...</strong>
                       </div>
-                      <span className="step-desc">Runs Lunchbox as an independent Mac app</span>
+                      <span className="step-desc">Runs School Lunch SMFC as an independent Mac app</span>
                     </div>
                   </div>
                 </>

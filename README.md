@@ -1,8 +1,8 @@
-# Lunchbox SMFC
+# School Lunch SMFC
 
 An unofficial, readable view of the San Mateo–Foster City School District lunch menus.
 
-Live site: https://rokeyge.github.io/lunch-lens/
+Live site: https://school-lunch.rokey.ge/
 
 ## Features
 
