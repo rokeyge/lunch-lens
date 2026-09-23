@@ -1,0 +1,319 @@
+{
+  "schemaVersion": 1,
+  "menuType": "elementary-standard",
+  "month": "2026-10",
+  "title": "SAN MATEO-FOSTER CITY SCHOOL DISTRICT ELEMENTARY SCHOOL LUNCH MENU",
+  "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/october-elementary-school-menusss",
+  "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1789660693/smfcsdnet/qxn5cwsa0ffewivim3me/OCTESLUNCHMENU.png",
+  "sourceImagePath": "menu-sources/elementary-standard-2026-10.jpg",
+  "sourceSha256": "fa6bd551d53dc8fa8faef5d8dd557786ad2bd495e2f6df94d8fb23f13abd3dac",
+  "checkedAt": "2026-09-23T00:49:54.269Z",
+  "automated": true,
+  "model": "gemini-3.5-flash-lite",
+  "dailyNote": "ITEMS AVAILABLE DAILY: CHOICE OF DAILY HOT ENTREE, YOGURT PACK, OR SUN BUTTER SANDWICH PACK, FRUITS AND VEGETABLES, CHOICE OF NONFAT CHOCOLATE OR 1% WHITE MILK",
+  "days": [
+    {
+      "date": "2026-10-01",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHEESE PIZZA ROUND",
+          "vegetarian": false
+        },
+        {
+          "name": "BEEF PEPPERONI PIZZA",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-02",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-10-05",
+      "status": "service",
+      "choices": [
+        {
+          "name": "TURKEY NACHOS & TORTILLA CHIPS",
+          "vegetarian": false
+        },
+        {
+          "name": "VEGGIE BURGER & FRIES",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-06",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHEESE BREADSTICKS & MARINARA SAUCE",
+          "vegetarian": false
+        },
+        {
+          "name": "TINGA CHICKEN RICE BOWL",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-07",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHICKEN BURGER W/FRENCH FRIES",
+          "vegetarian": false
+        },
+        {
+          "name": "VEGETARIAN FLORENTINE PASTA",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-08",
+      "status": "service",
+      "choices": [
+        {
+          "name": "POLLO LOCO DRUMSTICK, CILANTRO RICE & CORN",
+          "vegetarian": false
+        },
+        {
+          "name": "BEAN & CHEESE PUPUSA W/CURTIDO",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-09",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHEESE PIZZA ROUND",
+          "vegetarian": false
+        },
+        {
+          "name": "TURKEY PEPPERONI PIZZA",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-12",
+      "status": "service",
+      "choices": [
+        {
+          "name": "TURKEY NACHOS & TORTILLA CHIPS",
+          "vegetarian": false
+        },
+        {
+          "name": "VEGGIE BURGER & FRIES",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHEESE BREADSTICKS & MARINARA SAUCE",
+          "vegetarian": false
+        },
+        {
+          "name": "TINGA CHICKEN RICE BOWL",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-14",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHICKEN BURGER W/FRENCH FRIES",
+          "vegetarian": false
+        },
+        {
+          "name": "VEGETARIAN FLORENTINE PASTA",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-15",
+      "status": "service",
+      "choices": [
+        {
+          "name": "POLLO LOCO DRUMSTICK, CILANTRO RICE & CORN",
+          "vegetarian": false
+        },
+        {
+          "name": "BEAN & CHEESE PUPUSA W/CURTIDO",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-16",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHEESE PIZZA ROUND",
+          "vegetarian": false
+        },
+        {
+          "name": "TURKEY PEPPERONI PIZZA",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-19",
+      "status": "service",
+      "choices": [
+        {
+          "name": "BEEF CHEESEBURGER SLIDERS",
+          "vegetarian": false
+        },
+        {
+          "name": "VEGGIE BURGER & FRIES",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-20",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHICKEN NUGGETS & FRIES",
+          "vegetarian": false
+        },
+        {
+          "name": "CREAMY TOMATO CURRY TORTELLINI W/GARLIC TOAST",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-21",
+      "status": "service",
+      "choices": [
+        {
+          "name": "BEEF BULGOGI RICE BOWL",
+          "vegetarian": false
+        },
+        {
+          "name": "BEAN & CHEESE QUESADILLA",
+          "vegetarian": false
+        },
+        {
+          "name": "HUMMUS PACK:HUMMUS, CUCUMBERS, PITA CHIPS",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "status": "service",
+      "choices": [
+        {
+          "name": "MACARONI & CHEESE",
+          "vegetarian": false
+        },
+        {
+          "name": "CHICKEN CORN DOG",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-23",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHEESE PIZZA ROUND",
+          "vegetarian": false
+        },
+        {
+          "name": "TURKEY PEPPERONI PIZZA",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-26",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHICKEN TIKKKA MASALA W/RICE & NAAN BREAD",
+          "vegetarian": false
+        },
+        {
+          "name": "VEGGIE BURGER & FRIES",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-27",
+      "status": "service",
+      "choices": [
+        {
+          "name": "BEEF TAQUITOS W/SALSA",
+          "vegetarian": false
+        },
+        {
+          "name": "BEAN, RICE & CHEESE BURRITO",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-28",
+      "status": "service",
+      "choices": [
+        {
+          "name": "ORANGE CHCIKEN W/VEGETABLE FRIED RICE",
+          "vegetarian": false
+        },
+        {
+          "name": "TERIYAKI TOFU & BROCCOLI RICE BOWL",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHICKEN ALFREDO PASTA",
+          "vegetarian": false
+        },
+        {
+          "name": "VEGGIE NUGGETS, FRENCH FRIES & CRACKERS",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-30",
+      "status": "service",
+      "choices": [
+        {
+          "name": "CHEESE PIZZA ROUND",
+          "vegetarian": false
+        },
+        {
+          "name": "TURKEY PEPPERONI PIZZA",
+          "vegetarian": false
+        }
+      ]
+    }
+  ]
+}
