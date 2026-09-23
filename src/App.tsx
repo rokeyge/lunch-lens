@@ -43,6 +43,24 @@ type CurrentData = {
 } & MenuProgram;
 
 const currentData = currentDataJson as unknown as CurrentData;
+const archivedMenus = Object.values(
+  import.meta.glob("./data/menus/*/*.json", { eager: true, import: "default" })
+) as MenuProgram[];
+
+const menusForProgram = (programId: string) => {
+  const byMonth = new Map<string, MenuProgram>();
+  for (const menu of archivedMenus) {
+    if (menu.menuType === programId) byMonth.set(menu.month, menu);
+  }
+  const latest = currentData.programs?.[programId];
+  if (latest) byMonth.set(latest.month, latest);
+  return Array.from(byMonth.values()).sort((a, b) => a.month.localeCompare(b.month));
+};
+
+const defaultMenuForDate = (menus: MenuProgram[], dateKey: string) => {
+  const month = dateKey.slice(0, 7);
+  return menus.filter((menu) => menu.month <= month).at(-1) ?? menus[0] ?? currentData;
+};
 
 const schoolExists = (schoolId: string | null): schoolId is string =>
   schoolId !== null && SCHOOLS.some((school) => school.id === schoolId);
@@ -101,10 +119,14 @@ export default function App() {
 
   const [schoolId, setSchoolId] = useState(getInitialSchoolId);
   const selectedSchool = useMemo(() => getSchool(schoolId), [schoolId]);
+  const availableMenus = useMemo(() => menusForProgram(selectedSchool.programId), [selectedSchool.programId]);
+  const [selectedMonth, setSelectedMonth] = useState(() =>
+    defaultMenuForDate(menusForProgram(getSchool(getInitialSchoolId()).programId), today).month
+  );
 
   const activeMenu: MenuProgram = useMemo(() => {
-    return currentData.programs?.[selectedSchool.programId] ?? currentData;
-  }, [selectedSchool.programId]);
+    return availableMenus.find((menu) => menu.month === selectedMonth) ?? defaultMenuForDate(availableMenus, today);
+  }, [availableMenus, selectedMonth, today]);
 
   const weeks = useMemo(() => buildWeeks(activeMenu.month), [activeMenu.month]);
   const matchingWeek = weeks.findIndex((week) => week.includes(relevantSchoolDate));
@@ -194,7 +216,8 @@ export default function App() {
   const handleSchoolChange = (newSchoolId: string) => {
     setSchoolId(newSchoolId);
     const newSchool = getSchool(newSchoolId);
-    const newMenu: MenuProgram = currentData.programs?.[newSchool.programId] ?? currentData;
+    const newMenu = defaultMenuForDate(menusForProgram(newSchool.programId), today);
+    setSelectedMonth(newMenu.month);
     const newWeeks = buildWeeks(newMenu.month);
     if (newMenu.month !== activeMenu.month) {
       const newMatching = newWeeks.findIndex((w) => w.includes(relevantSchoolDate));
@@ -203,6 +226,15 @@ export default function App() {
     } else {
       setWeekIndex((prev) => Math.max(0, Math.min(prev, newWeeks.length - 1)));
     }
+  };
+
+  const handleMonthChange = (month: string) => {
+    const newMenu = availableMenus.find((menu) => menu.month === month);
+    if (!newMenu) return;
+    setSelectedMonth(month);
+    const newWeeks = buildWeeks(newMenu.month);
+    const newMatching = newWeeks.findIndex((week) => week.includes(relevantSchoolDate));
+    setWeekIndex(newMatching >= 0 ? newMatching : relevantSchoolDate < `${newMenu.month}-01` ? 0 : newWeeks.length - 1);
   };
 
   const changeView = (value: "week" | "month") => {
@@ -358,6 +390,16 @@ export default function App() {
           <span>Selected School</span>
           <strong>{selectedSchool.name}</strong>
           <small>{activeMenu.title}</small>
+          {availableMenus.length > 1 && (
+            <label className="month-selector">
+              <span className="visually-hidden">Select menu month</span>
+              <select value={activeMenu.month} onChange={(event) => handleMonthChange(event.target.value)}>
+                {availableMenus.map((menu) => (
+                  <option value={menu.month} key={menu.month}>{formatMonth(menu.month)}</option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
       </section>
 

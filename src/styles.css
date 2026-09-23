@@ -135,6 +135,17 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
   border-color: var(--green);
 }
 
+.month-selector select {
+  margin-top: 0.45rem;
+  padding: 0.35rem 1.8rem 0.35rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
 .freshness-bar-container {
   max-width: 1180px;
   margin: 0 auto;

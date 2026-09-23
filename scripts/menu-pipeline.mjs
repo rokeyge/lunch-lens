@@ -225,17 +225,6 @@ export const cleanMealName = (name) => {
   return lower.charAt(0).toUpperCase() + lower.slice(1);
 };
 
-export const monthKeyInTimeZone = (date = new Date(), timeZone = "America/Los_Angeles") => {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit"
-  }).formatToParts(date);
-  const year = parts.find((part) => part.type === "year")?.value;
-  const month = parts.find((part) => part.type === "month")?.value;
-  return `${year}-${month}`;
-};
-
 export function validateMenu(menu, expectedMonth = menu?.month) {
   const errors = [];
   if (!menu || typeof menu !== "object") return ["menu must be an object"];
@@ -412,12 +401,6 @@ export async function updateProgramMenu(programId, force = process.env.FORCE_MEN
 
   if (currentProgram?.month && source.month < currentProgram.month) {
     console.log(`[${programId}] No change: newest discovered menu ${source.month} is older than published menu ${currentProgram.month}.`);
-    return false;
-  }
-
-  const currentMonth = monthKeyInTimeZone();
-  if (source.month > currentMonth && !force) {
-    console.log(`[${programId}] No change: discovered ${source.month} menu is upcoming; keeping ${currentProgram.month} active through ${currentMonth}.`);
     return false;
   }
 
