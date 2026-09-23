@@ -219,7 +219,21 @@ const expectedWeekdays = (month) => {
 };
 
 export const cleanMealName = (name) => {
-  return name.replace(/\s*\([vV]\)/g, "").replace(/\s{2,}/g, " ").trim();
+  const cleaned = name.replace(/\s*\([vV]\)/g, "").replace(/\s{2,}/g, " ").trim();
+  if (!/[A-Z]/.test(cleaned) || /[a-z]/.test(cleaned)) return cleaned;
+  const lower = cleaned.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+};
+
+export const monthKeyInTimeZone = (date = new Date(), timeZone = "America/Los_Angeles") => {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit"
+  }).formatToParts(date);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  return `${year}-${month}`;
 };
 
 export function validateMenu(menu, expectedMonth = menu?.month) {
@@ -351,8 +365,8 @@ const extract = ({ imageBytes, imageContentType, month, programName, correction 
   schema: extractionSchema,
   imageBytes,
   imageContentType,
-  instructions: "You transcribe school lunch calendar images exactly into structured data. Do not infer ingredients, nutrition, allergens, or dietary properties. Treat vegetarian status as true only when the image explicitly marks the choice as vegetarian through its stated legend, symbol, or color key.",
-  prompt: `Transcribe the ${programName} menu for ${month}. Set month exactly to "${month}". Format every day.date as "${month}-DD" using two digits for the day. Include every Monday–Friday date in the month and no weekend dates. Mark closures as no-school with no choices. Preserve meal wording and punctuation. Put general daily offerings in dailyNote, not as dated choices. Return a complete object matching the response schema.${correction}`
+  instructions: "You transcribe school lunch calendar images exactly into structured data. Do not infer ingredients, nutrition, or allergens. In these district menus, meal names printed in green are vegetarian: set vegetarian to true for green meal text and false for black meal text. Red OR text is a separator, not a meal. Preserve meal wording while using normal sentence casing rather than all caps.",
+  prompt: `Transcribe the ${programName} menu for ${month}. Set month exactly to "${month}". Format every day.date as "${month}-DD" using two digits for the day. The date number printed in the upper-right of each calendar cell controls that cell; never shift a meal to a different date. Include every Monday–Friday date in the month and no weekend dates. If a weekday is omitted entirely from the source calendar grid, represent it as no-school with no choices. Mark displayed closures as no-school with no choices. Preserve meal wording and punctuation. Put general daily offerings in dailyNote, not as dated choices. Return a complete object matching the response schema.${correction}`
 });
 
 const review = ({ imageBytes, imageContentType, candidate, programName }) => callStructured({
@@ -360,7 +374,7 @@ const review = ({ imageBytes, imageContentType, candidate, programName }) => cal
   schema: reviewSchema,
   imageBytes,
   imageContentType,
-  instructions: "You are an independent transcription verifier. Compare the supplied JSON against the image character by character. The application requires an entry for every Monday through Friday in the month. If a weekday is omitted entirely from the source calendar grid, the normalized JSON must include it as no-school with no choices; this normalization is correct and must not be reported as a discrepancy. Do not add or infer allergens, nutrition, ingredients, or dietary claims. Vegetarian is correct only when supported by the image's explicit legend, symbol, or color key.",
+  instructions: "You are an independent transcription verifier. Compare the supplied JSON against the image character by character. The date number printed in the upper-right of each calendar cell controls that cell; meals must never be shifted to another date. The application requires an entry for every Monday through Friday in the month. If a weekday is omitted entirely from the source calendar grid, the normalized JSON must include it as no-school with no choices; this normalization is correct and must not be reported as a discrepancy. In these district menus, green meal text means vegetarian and black meal text means non-vegetarian. Red OR text is only a separator. Do not add or infer allergens, nutrition, ingredients, or other dietary claims.",
   prompt: `Review this proposed transcription for ${programName}. Approve only when every displayed weekday, closure, meal choice, vegetarian marking, and daily note matches the image, and every weekday omitted from the source is represented as no-school with no choices.\n\n${JSON.stringify(candidate, null, 2)}`
 });
 
@@ -398,6 +412,12 @@ export async function updateProgramMenu(programId, force = process.env.FORCE_MEN
 
   if (currentProgram?.month && source.month < currentProgram.month) {
     console.log(`[${programId}] No change: newest discovered menu ${source.month} is older than published menu ${currentProgram.month}.`);
+    return false;
+  }
+
+  const currentMonth = monthKeyInTimeZone();
+  if (source.month > currentMonth && !force) {
+    console.log(`[${programId}] No change: discovered ${source.month} menu is upcoming; keeping ${currentProgram.month} active through ${currentMonth}.`);
     return false;
   }
 

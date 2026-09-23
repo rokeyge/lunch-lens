@@ -17,6 +17,11 @@ test("cleanMealName strips literal (V) and (v) without distorting surrounding te
   assert.equal(cleanMealName("  Grilled cheese (V)  "), "Grilled cheese");
 });
 
+test("cleanMealName converts all-caps menu text to readable sentence case", () => {
+  assert.equal(cleanMealName("VEGGIE BURGER & FRIES"), "Veggie burger & fries");
+  assert.equal(cleanMealName("Chicken Alfredo pasta"), "Chicken Alfredo pasta");
+});
+
 test("getRelevantSchoolDate maps weekends to upcoming Monday and preserves weekdays", () => {
   // Weekdays (Monday - Friday) unchanged
   assert.equal(getRelevantSchoolDate("2026-09-07"), "2026-09-07"); // Monday
@@ -94,5 +99,4 @@ test("PWA manifest contains valid metadata and required icons", async () => {
     );
   }
 });
-
 

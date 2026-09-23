@@ -2,10 +2,13 @@ export type Choice = { name: string; vegetarian: boolean };
 export type MenuDay = { date: string; status: "service" | "no-school"; choices: Choice[] };
 
 export const cleanMealName = (name: string): string => {
-  return name
+  const cleaned = name
     .replace(/\s*\([vV]\)/g, "")
     .replace(/\s{2,}/g, " ")
     .trim();
+  if (!/[A-Z]/.test(cleaned) || /[a-z]/.test(cleaned)) return cleaned;
+  const lower = cleaned.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
 };
 
 export const dateParts = (date: string) => ({

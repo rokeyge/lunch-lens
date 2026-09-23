@@ -7,6 +7,7 @@ import {
   discoverLunchImage,
   discoverPostForProgram,
   discoverLunchImageForProgram,
+  monthKeyInTimeZone,
   normalizeExtractedMenu,
   validateMenu
 } from "../scripts/menu-pipeline.mjs";
@@ -60,6 +61,11 @@ test("normalizes model-supplied month to trusted discovery metadata", () => {
     ...candidate,
     month: "2026-10"
   });
+});
+
+test("uses the district time zone when deciding which menu month is current", () => {
+  assert.equal(monthKeyInTimeZone(new Date("2026-10-01T01:00:00Z")), "2026-09");
+  assert.equal(monthKeyInTimeZone(new Date("2026-10-01T08:00:00Z")), "2026-10");
 });
 
 test("current menu passes structural validation", async () => {
