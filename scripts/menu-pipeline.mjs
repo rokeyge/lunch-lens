@@ -222,10 +222,13 @@ export const cleanMealName = (name) => {
   return name.replace(/\s*\([vV]\)/g, "").replace(/\s{2,}/g, " ").trim();
 };
 
-export function validateMenu(menu, expectedMonth = menu.month) {
+export function validateMenu(menu, expectedMonth = menu?.month) {
   const errors = [];
+  if (!menu || typeof menu !== "object") return ["menu must be an object"];
   if (!/^\d{4}-\d{2}$/.test(menu.month || "")) errors.push("month must use YYYY-MM");
   if (menu.month !== expectedMonth) errors.push(`menu month ${menu.month} does not match discovered month ${expectedMonth}`);
+  if (typeof menu.title !== "string" || !menu.title.trim()) errors.push("title must be a non-empty string");
+  if (typeof menu.dailyNote !== "string") errors.push("dailyNote must be a string");
   if (!Array.isArray(menu.days)) errors.push("days must be an array");
   if (errors.length) return errors;
 
@@ -255,6 +258,11 @@ export function validateMenu(menu, expectedMonth = menu.month) {
   }
   return errors;
 }
+
+export const normalizeExtractedMenu = (candidate, discoveredMonth) => ({
+  ...candidate,
+  month: discoveredMonth
+});
 
 const GEMINI_API_KEY = process.env.LUNCH_KEY || process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
@@ -344,7 +352,7 @@ const extract = ({ imageBytes, imageContentType, month, programName, correction 
   imageBytes,
   imageContentType,
   instructions: "You transcribe school lunch calendar images exactly into structured data. Do not infer ingredients, nutrition, allergens, or dietary properties. Treat vegetarian status as true only when the image explicitly marks the choice as vegetarian through its stated legend, symbol, or color key.",
-  prompt: `Transcribe the ${programName} menu for ${month}. Include every Monday–Friday date in the month. Mark closures as no-school with no choices. Preserve meal wording and punctuation. Put general daily offerings in dailyNote, not as dated choices.${correction}`
+  prompt: `Transcribe the ${programName} menu for ${month}. Set month exactly to "${month}". Format every day.date as "${month}-DD" using two digits for the day. Include every Monday–Friday date in the month and no weekend dates. Mark closures as no-school with no choices. Preserve meal wording and punctuation. Put general daily offerings in dailyNote, not as dated choices. Return a complete object matching the response schema.${correction}`
 });
 
 const review = ({ imageBytes, imageContentType, candidate, programName }) => callStructured({
@@ -398,14 +406,28 @@ export async function updateProgramMenu(programId, force = process.env.FORCE_MEN
   }
 
   const { imageBytes, imageContentType } = source;
-  let candidate = await extract({ imageBytes, imageContentType, month: source.month, programName: program.name });
+  let candidate = normalizeExtractedMenu(
+    await extract({ imageBytes, imageContentType, month: source.month, programName: program.name }),
+    source.month
+  );
   let validationErrors = validateMenu(candidate, source.month);
-  if (validationErrors.length) throw new Error(`[${programId}] Extraction failed validation:\n- ${validationErrors.join("\n- ")}`);
+  if (validationErrors.length) {
+    const correction = `\n\nThe previous transcription failed validation. Re-read the image and return a corrected, complete transcription. Fix every error below:\n- ${validationErrors.join("\n- ")}`;
+    candidate = normalizeExtractedMenu(
+      await extract({ imageBytes, imageContentType, month: source.month, programName: program.name, correction }),
+      source.month
+    );
+    validationErrors = validateMenu(candidate, source.month);
+    if (validationErrors.length) throw new Error(`[${programId}] Corrected extraction failed validation:\n- ${validationErrors.join("\n- ")}`);
+  }
 
   let verdict = await review({ imageBytes, imageContentType, candidate, programName: program.name });
   if (!verdict.approved || verdict.discrepancies.length) {
     const correction = `\n\nA verifier found these possible errors in an earlier attempt. Re-read the image and produce a corrected full transcription:\n${JSON.stringify(verdict.discrepancies, null, 2)}`;
-    candidate = await extract({ imageBytes, imageContentType, month: source.month, programName: program.name, correction });
+    candidate = normalizeExtractedMenu(
+      await extract({ imageBytes, imageContentType, month: source.month, programName: program.name, correction }),
+      source.month
+    );
     validationErrors = validateMenu(candidate, source.month);
     if (validationErrors.length) throw new Error(`[${programId}] Corrected extraction failed validation:\n- ${validationErrors.join("\n- ")}`);
     verdict = await review({ imageBytes, imageContentType, candidate, programName: program.name });

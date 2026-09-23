@@ -7,6 +7,7 @@ import {
   discoverLunchImage,
   discoverPostForProgram,
   discoverLunchImageForProgram,
+  normalizeExtractedMenu,
   validateMenu
 } from "../scripts/menu-pipeline.mjs";
 
@@ -51,6 +52,14 @@ test("chooses the correct lunch images for all programs", () => {
                        https://resources.finalsite.net/images/f_auto,q_auto/v1788454341/smfcsdnet/fl1yqcbpj1eovnsxeozf/SEPTBAYSIDEBREAKFASTMENU.png`;
   const baysideProg = PROGRAMS.find((p) => p.id === "elementary-bayside");
   assert.equal(discoverLunchImageForProgram(baysideHtml, baysideProg), "https://resources.finalsite.net/images/f_auto,q_auto/v1788454392/smfcsdnet/ebdl7ose2eeiqibducjf/SEPTBAYSIDELUNCHMENU.png");
+});
+
+test("normalizes model-supplied month to trusted discovery metadata", () => {
+  const candidate = { month: "OCTOBER", title: "October lunch", dailyNote: "", days: [] };
+  assert.deepEqual(normalizeExtractedMenu(candidate, "2026-10"), {
+    ...candidate,
+    month: "2026-10"
+  });
 });
 
 test("current menu passes structural validation", async () => {
