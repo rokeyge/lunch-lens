@@ -360,8 +360,8 @@ const review = ({ imageBytes, imageContentType, candidate, programName }) => cal
   schema: reviewSchema,
   imageBytes,
   imageContentType,
-  instructions: "You are an independent transcription verifier. Compare the supplied JSON against the image character by character. Do not add or infer allergens, nutrition, ingredients, or dietary claims. Vegetarian is correct only when supported by the image's explicit legend, symbol, or color key.",
-  prompt: `Review this proposed transcription for ${programName}. Approve only when every weekday, closure, meal choice, vegetarian marking, and daily note matches the image.\n\n${JSON.stringify(candidate, null, 2)}`
+  instructions: "You are an independent transcription verifier. Compare the supplied JSON against the image character by character. The application requires an entry for every Monday through Friday in the month. If a weekday is omitted entirely from the source calendar grid, the normalized JSON must include it as no-school with no choices; this normalization is correct and must not be reported as a discrepancy. Do not add or infer allergens, nutrition, ingredients, or dietary claims. Vegetarian is correct only when supported by the image's explicit legend, symbol, or color key.",
+  prompt: `Review this proposed transcription for ${programName}. Approve only when every displayed weekday, closure, meal choice, vegetarian marking, and daily note matches the image, and every weekday omitted from the source is represented as no-school with no choices.\n\n${JSON.stringify(candidate, null, 2)}`
 });
 
 export const readCurrent = async () => JSON.parse(await readFile(CURRENT_MENU_PATH, "utf8"));
