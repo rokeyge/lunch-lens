@@ -325,7 +325,7 @@ export default function App() {
   };
 
   return (
-    <main>
+    <main id="top">
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Lunchbox SMFC home">
           <span className="brand-mark">L</span>
@@ -375,7 +375,7 @@ export default function App() {
         )}
       </div>
 
-      <section className="hero" id="top">
+      <section className="hero">
         <div className="hero-copy">
           <p className="eyebrow">{monthLabel} · Lunch Menu</p>
           <h1>What’s for lunch?</h1>
