@@ -285,8 +285,9 @@ export const normalizeExtractedMenu = (candidate, discoveredMonth) => {
 
 const GEMINI_API_KEY = process.env.LUNCH_KEY || process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
-const MODEL = GEMINI_MODEL;
+const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.5-flash-lite";
 const MAX_API_ATTEMPTS = 4;
+const usedModels = new Set();
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -315,9 +316,11 @@ function toGeminiSchema(schema) {
 
 const callGemini = async ({ schema, instructions, prompt, imageBytes, imageContentType }) => {
   const geminiSchema = toGeminiSchema(schema);
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-  for (let attempt = 1; attempt <= MAX_API_ATTEMPTS; attempt += 1) {
-    const response = await fetch(url, {
+  const models = [...new Set([GEMINI_MODEL, GEMINI_FALLBACK_MODEL])];
+  for (const [modelIndex, model] of models.entries()) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+    for (let attempt = 1; attempt <= MAX_API_ATTEMPTS; attempt += 1) {
+      const response = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -343,20 +346,27 @@ const callGemini = async ({ schema, instructions, prompt, imageBytes, imageConte
           temperature: 0.1
         }
       })
-    });
-    const body = await response.json();
-    if (response.ok) {
-      const text = body.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error(`Gemini response did not contain content text: ${JSON.stringify(body)}`);
-      return JSON.parse(text);
+      });
+      const body = await response.json();
+      if (response.ok) {
+        const text = body.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) throw new Error(`Gemini response did not contain content text: ${JSON.stringify(body)}`);
+        usedModels.add(model);
+        return JSON.parse(text);
+      }
+
+      const message = `Gemini API error ${response.status}: ${body.error?.message || JSON.stringify(body)}`;
+      if (!isRetryableStatus(response.status)) throw new Error(message);
+      if (attempt === MAX_API_ATTEMPTS) {
+        if (modelIndex === models.length - 1) throw new Error(message);
+        console.warn(`${message} Falling back from ${model} to ${models[modelIndex + 1]}.`);
+        break;
+      }
+
+      const delay = 2 ** (attempt - 1) * 5_000;
+      console.warn(`${message} Retrying ${model} in ${delay / 1000}s (${attempt}/${MAX_API_ATTEMPTS})...`);
+      await wait(delay);
     }
-
-    const message = `Gemini API error ${response.status}: ${body.error?.message || JSON.stringify(body)}`;
-    if (!isRetryableStatus(response.status) || attempt === MAX_API_ATTEMPTS) throw new Error(message);
-
-    const delay = 2 ** (attempt - 1) * 5_000;
-    console.warn(`${message} Retrying in ${delay / 1000}s (${attempt}/${MAX_API_ATTEMPTS})...`);
-    await wait(delay);
   }
 };
 
@@ -424,6 +434,7 @@ export async function updateProgramMenu(programId, force = process.env.FORCE_MEN
     throw new Error(`LUNCH_KEY (Gemini) is required when a new or forced menu extraction needs an LLM review for ${programId}.`);
   }
 
+  usedModels.clear();
   const { imageBytes, imageContentType } = source;
   let candidate = normalizeExtractedMenu(
     await extract({ imageBytes, imageContentType, month: source.month, programName: program.name }),
@@ -467,7 +478,7 @@ export async function updateProgramMenu(programId, force = process.env.FORCE_MEN
     sourceSha256: source.imageSha256,
     checkedAt,
     automated: true,
-    model: MODEL,
+    model: [...usedModels].join(", "),
     dailyNote: candidate.dailyNote,
     days: candidate.days
       .map((day) => ({
