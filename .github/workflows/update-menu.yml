@@ -75,17 +75,6 @@ jobs:
             gh issue create --title "$ISSUE_TITLE" --body "$BODY" --label "bug"
           fi
 
-      - name: Close resolved failure issue
-        if: success() && inputs.program == ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          ISSUE_TITLE="District menu update failure"
-          EXISTING_ISSUE=$(gh issue list --state open --search "$ISSUE_TITLE" --json number --jq '.[0].number')
-          if [ -n "$EXISTING_ISSUE" ]; then
-            gh issue close "$EXISTING_ISSUE" --comment "Resolved: District menu update succeeded in run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}."
-          fi
-
       - name: Check for a published update
         if: always()
         id: changes
@@ -99,7 +88,7 @@ jobs:
 
       - name: Commit verified menu
         id: commit
-        if: always() && steps.changes.outputs.changed == 'true'
+        if: always() && !cancelled() && steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -108,10 +97,21 @@ jobs:
           git push
 
       - name: Deploy updated menu
-        if: always() && steps.commit.outcome == 'success'
+        if: always() && !cancelled() && steps.commit.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --ref main
+
+      - name: Close resolved failure issue
+        if: success() && inputs.program == ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_TITLE="District menu update failure"
+          EXISTING_ISSUE=$(gh issue list --state open --search "$ISSUE_TITLE" --json number --jq '.[0].number')
+          if [ -n "$EXISTING_ISSUE" ]; then
+            gh issue close "$EXISTING_ISSUE" --comment "Resolved: Full menu batch succeeded in run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}."
+          fi
 
       - name: Save menu checkpoints
         if: always() && !cancelled()

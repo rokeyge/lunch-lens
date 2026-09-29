@@ -60,7 +60,7 @@ The pipeline deliberately does not extract or infer allergens, ingredients, or n
 2. Archives the original graphics and skips LLM processing when hashes have not changed.
 3. Extracts and verifies strict JSON only when updates are detected.
 4. If ingestion fails, automatically opens or updates a GitHub issue for visibility.
-5. When resolved, automatically closes the tracking issue.
+5. After a successful full batch and publication steps, closes the tracking issue.
 6. Commits verified menus, archives images, and triggers GitHub Pages deployment.
 
 Add your Gemini API key (Google AI Studio) as an Actions secret named `LUNCH_KEY` under **Repository settings → Secrets and variables → Actions → Secrets**.
