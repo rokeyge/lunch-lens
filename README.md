@@ -60,16 +60,93 @@ The pipeline deliberately does not extract or infer allergens, ingredients, or n
 2. Archives the original graphics and skips LLM processing when hashes have not changed.
 3. Extracts and verifies strict JSON only when updates are detected.
 4. If ingestion fails, automatically opens or updates a GitHub issue for visibility.
-5. When resolved, automatically closes the tracking issue.
-6. Commits verified menus, archives images, and triggers GitHub Pages deployment.
+5. After a successful full batch and publication steps, closes the tracking issue.
+6. Commits verified menus and archived images. Cloudflare's connected Git integration handles deployment from `main`.
 
 Add your Gemini API key (Google AI Studio) as an Actions secret named `LUNCH_KEY` under **Repository settings → Secrets and variables → Actions → Secrets**.
 
-## GitHub Pages
+## Recovery and model operation
 
-`.github/workflows/pages.yml` builds and publishes the static site whenever a commit reaches `main`.
+### Recovery and diagnostics
 
-To choose the design for the whole site, set the repository Actions variable `SITE_DESIGN` to `playful` or `classic` under **Settings → Secrets and variables → Actions → Variables**. If it is unset, the playful design is used. After changing it, open **Actions → Deploy to GitHub Pages → Run workflow** to rebuild and publish the site. This is a site-wide build setting, not a URL parameter or a visitor preference.
+Programs publish independently: a failed program retains its previous menu while
+successful programs are committed even if the batch exits with an error. The
+Cloudflare deployment is handled separately from this workflow. Only a successful full batch
+can resolve the shared failure issue; a targeted success cannot clear it.
+
+Before parsing, downloaded image bytes and source metadata are retained in
+`.menu-state/` as JSON with a base64 image. Successful model calls are checkpointed
+by the exact image, prompt, schema, and model configuration. A rerun reuses completed
+calls; rejected reviews are retained for diagnosis but reviewed again. Changed
+inputs invalidate checkpoints, and `force=true` bypasses them. Images are still
+downloaded each run so edits at an existing URL can be detected.
+
+Actions restores/saves these checkpoints with a branch-scoped cache, including
+after pipeline failure. Caches may be evicted, so this saves API calls but is not
+the durable source of published data. The `menu-diagnostics` artifact retains
+source snapshots, model results, and per-program outcomes for 30 days. Neither
+cache nor artifact contains the API key. Published data remains in Git.
+
+Missing weekdays and empty service placeholders intentionally become `no-school`.
+This is a menu availability convention, not independently verified attendance data.
+The district publishes a [2026–27 school calendar](https://www.smfcsd.net/our-district/calendar).
+Its [board-approved PDF](https://www.smfcsd.net/fs/resource-manager/view/6d52bd14-e9f8-4c28-a1a8-c19b50d32378)
+is dated February 22, 2024 and explicitly lists October 2 as a staff PD day and
+October 5–9 as Fall Break, confirming the omitted week that triggered this work.
+Automated calendar ingestion is not implemented; preschool applicability and
+future calendar revisions still need checking before using it as a publication
+gate. The source menu remains authoritative for this application.
+
+Tests in `tests/menu-state.test.mjs` simulate recovery and partial failure without
+network access or Gemini quota. Run with `node --test tests/menu-state.test.mjs`.
+
+The primary model defaults to `gemini-3.8-flash`; fallbacks are
+`gemini-3.6-flash,gemini-3.5-flash-lite`. Configure `GEMINI_MODEL` and the
+comma-separated `GEMINI_FALLBACK_MODELS` locally. Actions accepts manual `model`,
+`program` (blank means all five), and `force` inputs. Each changed program normally
+needs extraction plus review; corrections add calls. Free-tier limits are per
+minute and day, and available quota does not guarantee model capacity.
+
+Requests to each model are spaced at least 13 seconds apart. Retryable 429/5xx
+responses get at most two attempts per model, honoring `Retry-After` and Google's
+structured retry delay. Delays over a minute trigger fallback. An exhausted model
+is skipped for the remainder of the process; authentication/request errors fail
+immediately. Each HTTP request times out after 90 seconds. Other clients sharing
+the key still consume quota; these limits are local to this runner.
+
+Review objections include complete candidate and source values. Code dismisses
+case/whitespace-only text objections only when the claimed candidate value matches
+an actual field on the specified date. Genuine wording differences, missing
+evidence, closures, and vegetarian objections still block publication. A rejection
+with no explanation also remains a failure. Normalization still fills missing
+weekdays and empty service entries as `no-school`.
+
+PR checks use mocked model requests and temporary checkpoint directories; they
+require no API secrets. Production ingestion runs only on schedule or manual
+dispatch. To test a single program after merging:
+
+```bash
+gh workflow run update-menu.yml -f program=preschool -f force=false
+```
+
+## Cloudflare hosting
+
+The site is hosted by the `lunch-lens` Cloudflare Worker. Cloudflare's connected
+Git integration builds and deploys the production branch, `main`. GitHub Actions
+runs tests and updates menu data; there is no GitHub Pages deployment workflow.
+Cloudflare branch preview builds are configured separately in the Worker dashboard.
+`wrangler.jsonc` identifies the Worker and the static assets in `dist/`. Use
+`npm run build` as the build command, `npx wrangler deploy` for production, and
+`npx wrangler versions upload` for branch version uploads. Version uploads do not
+promote the uploaded version to production.
+An ingestion run succeeding means verified data was committed, not that Cloudflare
+has finished deploying it; check the Cloudflare build status on that commit.
+
+To choose the design for the whole site, set the Cloudflare build environment
+variable `VITE_SITE_DESIGN` to `playful` or `classic`, then rebuild the Worker.
+If unset, the playful design is used. GitHub's former `SITE_DESIGN` Actions variable
+does not configure Cloudflare builds. This is a site-wide build setting, not a URL
+parameter or visitor preference.
 
 Build the static output locally with:
 
