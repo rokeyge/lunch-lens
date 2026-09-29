@@ -67,6 +67,35 @@ Add your Gemini API key (Google AI Studio) as an Actions secret named `LUNCH_KEY
 
 ## GitHub Pages
 
+### Recovery and diagnostics
+
+Programs publish independently: a failed program retains its previous menu while
+successful programs are committed even if the batch exits with an error. The
+deployment dispatch requires a successful commit. Only a successful full batch
+can resolve the shared failure issue; a targeted success cannot clear it.
+
+Before parsing, downloaded image bytes and source metadata are retained in
+`.menu-state/` as JSON with a base64 image. Successful model calls are checkpointed
+by the exact image, prompt, schema, and model configuration. A rerun reuses completed
+calls; rejected reviews are retained for diagnosis but reviewed again. Changed
+inputs invalidate checkpoints, and `force=true` bypasses them. Images are still
+downloaded each run so edits at an existing URL can be detected.
+
+Actions restores/saves these checkpoints with a branch-scoped cache, including
+after pipeline failure. Caches may be evicted, so this saves API calls but is not
+the durable source of published data. The `menu-diagnostics` artifact retains
+source snapshots, model results, and per-program outcomes for 30 days. Neither
+cache nor artifact contains the API key. Published data remains in Git.
+
+Missing weekdays and empty service placeholders intentionally become `no-school`.
+This is a menu availability convention, not independently verified attendance data.
+The district publishes a [2026–27 school calendar](https://www.smfcsd.net/our-district/calendar),
+but calendar ingestion is not implemented and program-specific applicability has
+not been verified. The source menu remains authoritative for this application.
+
+Tests in `tests/menu-state.test.mjs` simulate recovery and partial failure without
+network access or Gemini quota. Run with `node --test tests/menu-state.test.mjs`.
+
 `.github/workflows/pages.yml` builds and publishes the static site whenever a commit reaches `main`.
 
 To choose the design for the whole site, set the repository Actions variable `SITE_DESIGN` to `playful` or `classic` under **Settings → Secrets and variables → Actions → Variables**. If it is unset, the playful design is used. After changing it, open **Actions → Deploy to GitHub Pages → Run workflow** to rebuild and publish the site. This is a site-wide build setting, not a URL parameter or a visitor preference.

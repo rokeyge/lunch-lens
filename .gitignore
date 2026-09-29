@@ -1,4 +1,6 @@
 node_modules/
+.menu-state/
+menu-diagnostics/
 dist/
 .DS_Store
 *.log

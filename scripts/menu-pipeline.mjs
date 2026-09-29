@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { checkpoint, saveState, runPrograms } from './menu-state.mjs';
 
 export const MENU_PAGE_URL = "https://www.smfcsd.net/district-departments/business-services/child-nutrition-services/menu";
 const CURRENT_MENU_PATH = fileURLToPath(new URL("../src/data/current.json", import.meta.url));
@@ -197,6 +198,9 @@ export async function discoverSource(programId = "elementary-standard") {
   });
   const imageUrl = discoverLunchImageForProgram(postHtml, program);
   const image = await fetchBytes(imageUrl);
+  await saveState(`source-${program.id}-${createHash('sha256').update(image.bytes).digest('hex')}`, {
+    ...post, imageUrl, contentType: image.contentType, base64: image.bytes.toString('base64')
+  });
   return {
     programId: program.id,
     programName: program.name,
@@ -374,7 +378,17 @@ const callGemini = async ({ schema, instructions, prompt, imageBytes, imageConte
 };
 
 const callStructured = async (args) => {
-  if (GEMINI_API_KEY) return callGemini(args);
+  if (GEMINI_API_KEY) {
+    const saved = await checkpoint({ ...args, model: GEMINI_MODEL, fallbacks: GEMINI_FALLBACK_MODELS }, async () => {
+      const result = await callGemini(args);
+      return { result, models: [...usedModels] };
+    }, {
+      force: process.env.FORCE_MENU_UPDATE === 'true',
+      accept: ({ result }) => args.name !== 'school_lunch_review' || (result.approved && !result.discrepancies.length)
+    });
+    for (const model of saved.models) usedModels.add(model);
+    return saved.result;
+  }
   throw new Error("LUNCH_KEY (Google AI Studio / Gemini) is required for menu extraction.");
 };
 
@@ -514,24 +528,13 @@ export async function updateProgramMenu(programId, force = process.env.FORCE_MEN
 }
 
 export async function updateMenu(targetProgramId) {
-  if (targetProgramId) {
-    return updateProgramMenu(targetProgramId);
-  }
-  let anyUpdated = false;
-  const failures = [];
-  for (const program of PROGRAMS) {
-    try {
-      const updated = await updateProgramMenu(program.id);
-      if (updated) anyUpdated = true;
-    } catch (err) {
-      console.error(`Error updating program ${program.id}:`, err.message);
-      failures.push(`[${program.id}] ${err.message}`);
-    }
-  }
-  if (failures.length) {
-    throw new Error(`One or more program updates failed:\n\n${failures.join("\n\n")}`);
-  }
-  return anyUpdated;
+  const ids = targetProgramId ? [targetProgramId] : PROGRAMS.map(p => p.id);
+  const results = await runPrograms(ids, updateProgramMenu);
+  await mkdir('menu-diagnostics', { recursive: true });
+  await writeFile('menu-diagnostics/results.json', JSON.stringify(results, null, 2));
+  const failures = results.filter(r => r.status === 'failed');
+  if (failures.length) throw new Error(failures.map(r => `[${r.id}] ${r.error}`).join('\n'));
+  return results.some(r => r.status === 'updated');
 }
 
 const command = process.argv[2];
