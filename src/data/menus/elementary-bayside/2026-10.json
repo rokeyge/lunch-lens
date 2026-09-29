@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "menuType": "elementary-bayside",
+  "month": "2026-10",
+  "title": "Bayside Elementary School Lunch Menu",
+  "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/october-bayside-elementary-school-menus",
+  "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1790617592/smfcsdnet/iv8lrd1scnrfrhpphtpy/OCTBAYSIDEESLUNCHMENU.png",
+  "sourceImagePath": "menu-sources/elementary-bayside-2026-10.jpg",
+  "sourceSha256": "11f6abd3d2e19c94da0cd781d936f3120f574fb5b57167882e8bdd084dd79404",
+  "checkedAt": "2026-09-29T05:58:09.601Z",
+  "automated": true,
+  "model": "gemini-3.5-flash-lite",
+  "dailyNote": "Choice of daily hot entree, yogurt pack, or sun butter sandwich pack, fruits and vegetables, choice of nonfat chocolate or 1% white milk",
+  "days": [
+    {
+      "date": "2026-10-01",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza round",
+          "vegetarian": true
+        },
+        {
+          "name": "Beef pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-02",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-10-05",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-10-06",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-10-07",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-10-08",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-10-09",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-10-12",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Turkey nachos & tortilla chips",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie burger & fries",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese breadsticks & marinara sauce",
+          "vegetarian": true
+        },
+        {
+          "name": "Tinga chicken rice bowl",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-14",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Bag lunch (turkey/cheese sandwich, cheez-its crackers, baby carrots, fruit, veggie juice, milk)",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-15",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Pollo loco drumstick, cilantro rice & corn",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean & cheese pupusa w/curtido",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-10-16",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza round",
+          "vegetarian": true
+        },
+        {
+          "name": "Turkey pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-19",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Beef cheeseburger sliders",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie burger & fries",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-10-20",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken nuggets & fries",
+          "vegetarian": false
+        },
+        {
+          "name": "Creamy tomato curry tortellini w/garlic toast",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-10-21",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Bag lunch (turkey/cheese sandwich, cheez-its crackers, baby carrots, fruit, veggie juice, milk)",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Macaroni & cheese",
+          "vegetarian": true
+        },
+        {
+          "name": "Chicken corn dog",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-23",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza round",
+          "vegetarian": true
+        },
+        {
+          "name": "Turkey pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-26",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken tikkka masala w/rice & naan bread",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie burger & fries",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-10-27",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Beef taquitos w/salsa",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean, rice & cheese burrito",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-10-28",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Bag lunch (turkey/cheese sandwich, cheez-its crackers, baby carrots, fruit, veggie juice, milk)",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken alfredo pasta",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie nuggets, french fries & crackers",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-10-30",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese pizza round",
+          "vegetarian": true
+        },
+        {
+          "name": "Turkey pepperoni pizza",
+          "vegetarian": false
+        }
+      ]
+    }
+  ]
+}
