@@ -285,7 +285,7 @@ export const normalizeExtractedMenu = (candidate, discoveredMonth) => {
 
 const GEMINI_API_KEY = process.env.LUNCH_KEY || process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
-const GEMINI_FALLBACK_MODELS = (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.7-flash,gemini-3.6-flash,gemini-3.5-flash,gemini-3.5-flash-lite")
+const GEMINI_FALLBACK_MODELS = (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.6-flash,gemini-3.5-flash-lite")
   .split(",")
   .map((model) => model.trim())
   .filter(Boolean);

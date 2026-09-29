@@ -13,6 +13,10 @@ on:
         description: Optional program ID to process (blank processes all programs)
         type: string
         default: ""
+      model:
+        description: Optional primary Gemini model override
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -40,6 +44,7 @@ jobs:
         env:
           LUNCH_KEY: ${{ secrets.LUNCH_KEY }}
           GEMINI_API_KEY: ${{ secrets.LUNCH_KEY }}
+          GEMINI_MODEL: ${{ inputs.model || '' }}
           FORCE_MENU_UPDATE: ${{ inputs.force && 'true' || 'false' }}
           TARGET_PROGRAM: ${{ inputs.program || '' }}
         run: |
