@@ -9,6 +9,10 @@ on:
         description: Reprocess the current image even when its hash is unchanged
         type: boolean
         default: false
+      program:
+        description: Optional program ID to process (blank processes all programs)
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -37,7 +41,13 @@ jobs:
           LUNCH_KEY: ${{ secrets.LUNCH_KEY }}
           GEMINI_API_KEY: ${{ secrets.LUNCH_KEY }}
           FORCE_MENU_UPDATE: ${{ inputs.force && 'true' || 'false' }}
-        run: npm run menu:update
+          TARGET_PROGRAM: ${{ inputs.program || '' }}
+        run: |
+          if [ -n "$TARGET_PROGRAM" ]; then
+            npm run menu:update -- "$TARGET_PROGRAM"
+          else
+            npm run menu:update
+          fi
 
       - name: Report failure via GitHub issue
         if: failure() && steps.pipeline.outcome == 'failure'
