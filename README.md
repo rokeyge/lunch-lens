@@ -65,7 +65,7 @@ The pipeline deliberately does not extract or infer allergens, ingredients, or n
 
 Add your Gemini API key (Google AI Studio) as an Actions secret named `LUNCH_KEY` under **Repository settings → Secrets and variables → Actions → Secrets**.
 
-## GitHub Pages
+## Recovery and model operation
 
 ### Recovery and diagnostics
 
@@ -89,12 +89,47 @@ cache nor artifact contains the API key. Published data remains in Git.
 
 Missing weekdays and empty service placeholders intentionally become `no-school`.
 This is a menu availability convention, not independently verified attendance data.
-The district publishes a [2026–27 school calendar](https://www.smfcsd.net/our-district/calendar),
-but calendar ingestion is not implemented and program-specific applicability has
-not been verified. The source menu remains authoritative for this application.
+The district publishes a [2026–27 school calendar](https://www.smfcsd.net/our-district/calendar).
+Its [board-approved PDF](https://www.smfcsd.net/fs/resource-manager/view/6d52bd14-e9f8-4c28-a1a8-c19b50d32378)
+is dated February 22, 2024 and explicitly lists October 2 as a staff PD day and
+October 5–9 as Fall Break, confirming the omitted week that triggered this work.
+Automated calendar ingestion is not implemented; preschool applicability and
+future calendar revisions still need checking before using it as a publication
+gate. The source menu remains authoritative for this application.
 
 Tests in `tests/menu-state.test.mjs` simulate recovery and partial failure without
 network access or Gemini quota. Run with `node --test tests/menu-state.test.mjs`.
+
+The primary model defaults to `gemini-3.8-flash`; fallbacks are
+`gemini-3.6-flash,gemini-3.5-flash-lite`. Configure `GEMINI_MODEL` and the
+comma-separated `GEMINI_FALLBACK_MODELS` locally. Actions accepts manual `model`,
+`program` (blank means all five), and `force` inputs. Each changed program normally
+needs extraction plus review; corrections add calls. Free-tier limits are per
+minute and day, and available quota does not guarantee model capacity.
+
+Requests to each model are spaced at least 13 seconds apart. Retryable 429/5xx
+responses get at most two attempts per model, honoring `Retry-After` and Google's
+structured retry delay. Delays over a minute trigger fallback. An exhausted model
+is skipped for the remainder of the process; authentication/request errors fail
+immediately. Each HTTP request times out after 90 seconds. Other clients sharing
+the key still consume quota; these limits are local to this runner.
+
+Review objections include complete candidate and source values. Code dismisses
+case/whitespace-only text objections only when the claimed candidate value matches
+an actual field on the specified date. Genuine wording differences, missing
+evidence, closures, and vegetarian objections still block publication. A rejection
+with no explanation also remains a failure. Normalization still fills missing
+weekdays and empty service entries as `no-school`.
+
+PR checks use mocked model requests and temporary checkpoint directories; they
+require no API secrets. Production ingestion runs only on schedule or manual
+dispatch. To test a single program after merging:
+
+```bash
+gh workflow run update-menu.yml -f program=preschool -f force=false
+```
+
+## GitHub Pages
 
 `.github/workflows/pages.yml` builds and publishes the static site whenever a commit reaches `main`.
 

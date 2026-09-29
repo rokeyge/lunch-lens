@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { checkpoint, saveState, runPrograms } from './menu-state.mjs';
+import { createModelRequester, assessReview } from './menu-reliability.mjs';
 
 export const MENU_PAGE_URL = "https://www.smfcsd.net/district-departments/business-services/child-nutrition-services/menu";
 const CURRENT_MENU_PATH = fileURLToPath(new URL("../src/data/current.json", import.meta.url));
@@ -98,8 +99,10 @@ const reviewSchema = {
       items: {
         type: "object",
         additionalProperties: false,
-        required: ["date", "kind", "message"],
+        required: ["date", "kind", "message", "candidateValue", "sourceValue"],
         properties: {
+          candidateValue: { type: 'string' },
+          sourceValue: { type: 'string' },
           date: { type: "string" },
           kind: { type: "string", enum: ["date", "meal-text", "vegetarian", "closure", "daily-note", "other"] },
           message: { type: "string" }
@@ -293,12 +296,7 @@ const GEMINI_FALLBACK_MODELS = (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.
   .split(",")
   .map((model) => model.trim())
   .filter(Boolean);
-const MAX_API_ATTEMPTS = 2;
 const usedModels = new Set();
-
-const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
-
-const isRetryableStatus = (status) => status === 429 || status >= 500;
 
 function toGeminiSchema(schema) {
   if (!schema || typeof schema !== "object") return schema;
@@ -321,60 +319,24 @@ function toGeminiSchema(schema) {
   return converted;
 }
 
+const requestModel = createModelRequester();
 const callGemini = async ({ schema, instructions, prompt, imageBytes, imageContentType }) => {
-  const geminiSchema = toGeminiSchema(schema);
-  const models = [...new Set([GEMINI_MODEL, ...GEMINI_FALLBACK_MODELS])];
-  for (const [modelIndex, model] of models.entries()) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-    for (let attempt = 1; attempt <= MAX_API_ATTEMPTS; attempt += 1) {
-      const response = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: instructions }]
-        },
-        contents: [
-          {
-            parts: [
-              {
-                inlineData: {
-                  mimeType: imageContentType,
-                  data: imageBytes.toString("base64")
-                }
-              },
-              { text: prompt }
-            ]
-          }
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: geminiSchema,
-          temperature: 0.1
-        }
-      })
-      });
-      const body = await response.json();
-      if (response.ok) {
-        const text = body.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!text) throw new Error(`Gemini response did not contain content text: ${JSON.stringify(body)}`);
-        usedModels.add(model);
-        return JSON.parse(text);
-      }
-
-      const message = `Gemini API error ${response.status}: ${body.error?.message || JSON.stringify(body)}`;
-      if (!isRetryableStatus(response.status)) throw new Error(message);
-      if (attempt === MAX_API_ATTEMPTS) {
-        if (modelIndex === models.length - 1) throw new Error(message);
-        console.warn(`${message} Falling back from ${model} to ${models[modelIndex + 1]}.`);
-        break;
-      }
-
-      const delay = 2 ** (attempt - 1) * 5_000;
-      console.warn(`${message} Retrying ${model} in ${delay / 1000}s (${attempt}/${MAX_API_ATTEMPTS})...`);
-      await wait(delay);
+  const { model, body } = await requestModel({
+    models: [GEMINI_MODEL, ...GEMINI_FALLBACK_MODELS], apiKey: GEMINI_API_KEY,
+    body: {
+      systemInstruction: { parts: [{ text: instructions }] },
+      contents: [{ parts: [
+        { inlineData: { mimeType: imageContentType, data: imageBytes.toString('base64') } },
+        { text: prompt }
+      ] }],
+      generationConfig: { responseMimeType: 'application/json', responseSchema: toGeminiSchema(schema), temperature: 0.1 }
     }
-  }
+  });
+  const text = body.candidates?.[0]?.content?.parts?.filter(p => !p.thought && p.text).map(p => p.text).join('');
+  if (!text) throw new Error('Gemini response did not contain content text');
+  const result = JSON.parse(text);
+  usedModels.add(model);
+  return result;
 };
 
 const callStructured = async (args) => {
@@ -401,14 +363,14 @@ const extract = ({ imageBytes, imageContentType, month, programName, correction 
   prompt: `Transcribe the ${programName} menu for ${month}. Set month exactly to "${month}". Format every day.date as "${month}-DD" using two digits for the day. The date number printed in the upper-right of each calendar cell controls that cell; never shift a meal to a different date. Include every Monday–Friday date in the month and no weekend dates. If a weekday is omitted entirely from the source calendar grid, represent it as no-school with no choices. Mark displayed closures as no-school with no choices. Preserve meal wording and punctuation. Put general daily offerings in dailyNote, not as dated choices. Return a complete object matching the response schema.${correction}`
 });
 
-const review = ({ imageBytes, imageContentType, candidate, programName }) => callStructured({
+const review = async ({ imageBytes, imageContentType, candidate, programName }) => assessReview(await callStructured({
   name: "school_lunch_review",
   schema: reviewSchema,
   imageBytes,
   imageContentType,
   instructions: "You are an independent transcription verifier. Compare the supplied JSON against the image for content accuracy. The date number printed in the upper-right of each calendar cell controls that cell; meals must never be shifted to another date. The application requires an entry for every Monday through Friday in the month. A weekday whose cell is blank or omitted from the source calendar is normalized as no-school with no choices. That normalization is required and must never be reported as a closure discrepancy; report a closure discrepancy only when a no-school JSON entry conflicts with a visible meal in that dated cell. In a title such as '6th-8th Menu', 6th-8th identifies school grade levels, never calendar dates or a date range. Meal names are intentionally normalized to ordinary sentence casing, so compare their text case-insensitively and never report capitalization as a discrepancy. Preserve typos printed in the source: when candidate spelling matches the image case-insensitively, it is correct even if misspelled, and you must approve it rather than report a discrepancy. Never emit a discrepancy whose proposed and observed spellings are identical apart from capitalization. In these district menus, green meal text means vegetarian and black meal text means non-vegetarian. Red OR text is only a separator. Do not add or infer allergens, nutrition, ingredients, or other dietary claims.",
-  prompt: `Review this proposed transcription for ${programName}. Approve only when every displayed weekday, closure, meal choice, vegetarian marking, and daily note matches the image, and every weekday omitted from the source is represented as no-school with no choices.\n\n${JSON.stringify(candidate, null, 2)}`
-});
+  prompt: `Review this proposed transcription for ${programName}. For each discrepancy give candidateValue (the exact complete candidate field) and sourceValue (the complete value read from the source). For meal-text, quote the entire meal name, not a fragment. Approve only when every displayed weekday, closure, meal choice, vegetarian marking, and daily note matches the image, and every weekday omitted from the source is represented as no-school with no choices.\n\n${JSON.stringify(candidate, null, 2)}`
+}), candidate);
 
 export const readCurrent = async () => JSON.parse(await readFile(CURRENT_MENU_PATH, "utf8"));
 
