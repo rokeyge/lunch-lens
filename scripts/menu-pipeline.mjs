@@ -263,7 +263,11 @@ export function validateMenu(menu, expectedMonth = menu?.month) {
 }
 
 export const normalizeExtractedMenu = (candidate, discoveredMonth) => {
-  const suppliedDays = Array.isArray(candidate?.days) ? candidate.days : [];
+  const suppliedDays = (Array.isArray(candidate?.days) ? candidate.days : []).map((day) => (
+    day?.status === "service" && Array.isArray(day.choices) && day.choices.length === 0
+      ? { ...day, status: "no-school" }
+      : day
+  ));
   const suppliedDates = new Set(suppliedDays.map((day) => day.date));
   const missingDays = expectedWeekdays(discoveredMonth)
     .filter((date) => !suppliedDates.has(date))

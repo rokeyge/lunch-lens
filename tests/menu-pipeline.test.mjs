@@ -74,6 +74,7 @@ test("fills weekdays omitted from the source calendar as no-school", () => {
     days: [
       { date: "2026-10-01", status: "service", choices: [{ name: "Pizza", vegetarian: true }] },
       { date: "2026-10-02", status: "no-school", choices: [] },
+      { date: "2026-10-05", status: "service", choices: [] },
       { date: "2026-10-12", status: "service", choices: [{ name: "Tacos", vegetarian: false }] }
     ]
   };
