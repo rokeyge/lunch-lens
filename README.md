@@ -61,7 +61,7 @@ The pipeline deliberately does not extract or infer allergens, ingredients, or n
 3. Extracts and verifies strict JSON only when updates are detected.
 4. If ingestion fails, automatically opens or updates a GitHub issue for visibility.
 5. After a successful full batch and publication steps, closes the tracking issue.
-6. Commits verified menus, archives images, and triggers GitHub Pages deployment.
+6. Commits verified menus and archived images. Cloudflare's connected Git integration handles deployment from `main`.
 
 Add your Gemini API key (Google AI Studio) as an Actions secret named `LUNCH_KEY` under **Repository settings → Secrets and variables → Actions → Secrets**.
 
@@ -71,7 +71,7 @@ Add your Gemini API key (Google AI Studio) as an Actions secret named `LUNCH_KEY
 
 Programs publish independently: a failed program retains its previous menu while
 successful programs are committed even if the batch exits with an error. The
-deployment dispatch requires a successful commit. Only a successful full batch
+Cloudflare deployment is handled separately from this workflow. Only a successful full batch
 can resolve the shared failure issue; a targeted success cannot clear it.
 
 Before parsing, downloaded image bytes and source metadata are retained in
@@ -129,11 +129,24 @@ dispatch. To test a single program after merging:
 gh workflow run update-menu.yml -f program=preschool -f force=false
 ```
 
-## GitHub Pages
+## Cloudflare hosting
 
-`.github/workflows/pages.yml` builds and publishes the static site whenever a commit reaches `main`.
+The site is hosted by the `lunch-lens` Cloudflare Worker. Cloudflare's connected
+Git integration builds and deploys the production branch, `main`. GitHub Actions
+runs tests and updates menu data; there is no GitHub Pages deployment workflow.
+Cloudflare branch preview builds are configured separately in the Worker dashboard.
+`wrangler.jsonc` identifies the Worker and the static assets in `dist/`. Use
+`npm run build` as the build command, `npx wrangler deploy` for production, and
+`npx wrangler versions upload` for branch version uploads. Version uploads do not
+promote the uploaded version to production.
+An ingestion run succeeding means verified data was committed, not that Cloudflare
+has finished deploying it; check the Cloudflare build status on that commit.
 
-To choose the design for the whole site, set the repository Actions variable `SITE_DESIGN` to `playful` or `classic` under **Settings → Secrets and variables → Actions → Variables**. If it is unset, the playful design is used. After changing it, open **Actions → Deploy to GitHub Pages → Run workflow** to rebuild and publish the site. This is a site-wide build setting, not a URL parameter or a visitor preference.
+To choose the design for the whole site, set the Cloudflare build environment
+variable `VITE_SITE_DESIGN` to `playful` or `classic`, then rebuild the Worker.
+If unset, the playful design is used. GitHub's former `SITE_DESIGN` Actions variable
+does not configure Cloudflare builds. This is a site-wide build setting, not a URL
+parameter or visitor preference.
 
 Build the static output locally with:
 
