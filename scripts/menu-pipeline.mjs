@@ -262,10 +262,22 @@ export function validateMenu(menu, expectedMonth = menu?.month) {
   return errors;
 }
 
-export const normalizeExtractedMenu = (candidate, discoveredMonth) => ({
-  ...candidate,
-  month: discoveredMonth
-});
+export const normalizeExtractedMenu = (candidate, discoveredMonth) => {
+  const suppliedDays = Array.isArray(candidate?.days) ? candidate.days : [];
+  const suppliedDates = new Set(suppliedDays.map((day) => day.date));
+  const missingDays = expectedWeekdays(discoveredMonth)
+    .filter((date) => !suppliedDates.has(date))
+    .map((date) => ({ date, status: "no-school", choices: [] }));
+
+  return {
+    ...candidate,
+    month: discoveredMonth,
+    // Some district calendars omit an entire no-school week from the grid. Do
+    // this normalization deterministically instead of relying on the model to
+    // invent entries for dates that have no visible cells in the source image.
+    days: [...suppliedDays, ...missingDays].sort((a, b) => String(a.date).localeCompare(String(b.date)))
+  };
+};
 
 const GEMINI_API_KEY = process.env.LUNCH_KEY || process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";

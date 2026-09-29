@@ -56,10 +56,38 @@ test("chooses the correct lunch images for all programs", () => {
 
 test("normalizes model-supplied month to trusted discovery metadata", () => {
   const candidate = { month: "OCTOBER", title: "October lunch", dailyNote: "", days: [] };
-  assert.deepEqual(normalizeExtractedMenu(candidate, "2026-10"), {
-    ...candidate,
-    month: "2026-10"
+  const normalized = normalizeExtractedMenu(candidate, "2026-10");
+  assert.equal(normalized.month, "2026-10");
+  assert.equal(normalized.days.length, 22);
+  assert.deepEqual(normalized.days[0], {
+    date: "2026-10-01",
+    status: "no-school",
+    choices: []
   });
+});
+
+test("fills weekdays omitted from the source calendar as no-school", () => {
+  const candidate = {
+    month: "2026-10",
+    title: "October lunch",
+    dailyNote: "",
+    days: [
+      { date: "2026-10-01", status: "service", choices: [{ name: "Pizza", vegetarian: true }] },
+      { date: "2026-10-02", status: "no-school", choices: [] },
+      { date: "2026-10-12", status: "service", choices: [{ name: "Tacos", vegetarian: false }] }
+    ]
+  };
+
+  const normalized = normalizeExtractedMenu(candidate, "2026-10");
+  assert.deepEqual(normalized.days.find((day) => day.date === "2026-10-01"), candidate.days[0]);
+  for (const date of ["2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08", "2026-10-09"]) {
+    assert.deepEqual(normalized.days.find((day) => day.date === date), {
+      date,
+      status: "no-school",
+      choices: []
+    });
+  }
+  assert.deepEqual(validateMenu(normalized, "2026-10"), []);
 });
 
 test("current menu passes structural validation", async () => {
