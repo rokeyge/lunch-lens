@@ -285,8 +285,11 @@ export const normalizeExtractedMenu = (candidate, discoveredMonth) => {
 
 const GEMINI_API_KEY = process.env.LUNCH_KEY || process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
-const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.5-flash-lite";
-const MAX_API_ATTEMPTS = 4;
+const GEMINI_FALLBACK_MODELS = (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.7-flash,gemini-3.6-flash,gemini-3.5-flash,gemini-3.5-flash-lite")
+  .split(",")
+  .map((model) => model.trim())
+  .filter(Boolean);
+const MAX_API_ATTEMPTS = 2;
 const usedModels = new Set();
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -316,7 +319,7 @@ function toGeminiSchema(schema) {
 
 const callGemini = async ({ schema, instructions, prompt, imageBytes, imageContentType }) => {
   const geminiSchema = toGeminiSchema(schema);
-  const models = [...new Set([GEMINI_MODEL, GEMINI_FALLBACK_MODEL])];
+  const models = [...new Set([GEMINI_MODEL, ...GEMINI_FALLBACK_MODELS])];
   for (const [modelIndex, model] of models.entries()) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
     for (let attempt = 1; attempt <= MAX_API_ATTEMPTS; attempt += 1) {
