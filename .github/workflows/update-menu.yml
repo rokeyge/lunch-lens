@@ -81,6 +81,7 @@ jobs:
           fi
 
       - name: Check for a published update
+        if: always()
         id: changes
         shell: bash
         run: |
@@ -91,7 +92,7 @@ jobs:
           fi
 
       - name: Commit verified menu
-        if: steps.changes.outputs.changed == 'true'
+        if: always() && steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -100,7 +101,7 @@ jobs:
           git push
 
       - name: Deploy updated menu
-        if: steps.changes.outputs.changed == 'true'
+        if: always() && steps.changes.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --ref main
