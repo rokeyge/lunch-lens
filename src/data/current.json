@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-30T18:28:42.188Z",
+  "updatedAt": "2026-10-19T19:23:58.710Z",
   "defaultProgram": "elementary-standard",
   "programs": {
     "elementary-standard": {
@@ -904,23 +904,91 @@
     "middle-special-6-8": {
       "schemaVersion": 1,
       "menuType": "middle-special-6-8",
-      "month": "2026-10",
-      "title": "October 2026 6th-8th Menu San Mateo Foster-City SD - Parkside, Fiesta Gardens, North Shoreview",
-      "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/october-6-8-menus",
-      "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1790619526/smfcsdnet/lun2lhzp4oder4kxzc5x/OCTOBER6-8LUNCHMENU.png",
-      "sourceImagePath": "menu-sources/middle-special-6-8-2026-10.png",
-      "sourceSha256": "f1a579ec78119e80399aff68dd7bdcf7c54d84fbfdbec4d91cb78c66b2ea85a5",
-      "checkedAt": "2026-09-29T05:46:20.721Z",
+      "month": "2026-11",
+      "title": "November 2026 6th-8th Menu San Mateo Foster-City SD - Parkside, Fiesta Gardens, North Shoreview",
+      "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/november-6-8-menus-parkside-fiesta-gardens-north-shoreview",
+      "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1792433596/smfcsdnet/eiywbgw9bifkpnusvvnw/NOV6-8LUNCH_1.png",
+      "sourceImagePath": "menu-sources/middle-special-6-8-2026-11.png",
+      "sourceSha256": "96828a004773507dedb6b189c8c210c16915b4f4ae8972313eb1e0c539a390d8",
+      "checkedAt": "2026-10-19T19:23:58.710Z",
       "automated": true,
-      "model": "gemini-3.5-flash-lite",
+      "model": "gemini-3.6-flash, gemini-3.5-flash-lite",
       "dailyNote": "Items Available Daily: Choice of Daily Entree, Yogurt Pack, Wowbutter Pack, Fruit, Vegetables, Nonfat Chocolate or 1% White Milk (V) = Vegetarian Meal",
       "days": [
         {
-          "date": "2026-10-01",
+          "date": "2026-11-02",
           "status": "service",
           "choices": [
             {
-              "name": "Cheese Pizza Round",
+              "name": "Beef Hot Dog",
+              "vegetarian": false
+            },
+            {
+              "name": "Veggie Burger & Fries",
+              "vegetarian": true
+            }
+          ]
+        },
+        {
+          "date": "2026-11-03",
+          "status": "service",
+          "choices": [
+            {
+              "name": "Chicken Adobo, Potatoes and Rice",
+              "vegetarian": false
+            },
+            {
+              "name": "Cheese Bites w/Marinara Sauce",
+              "vegetarian": true
+            },
+            {
+              "name": "Turkey & Cheese on Parisian Bread",
+              "vegetarian": false
+            }
+          ]
+        },
+        {
+          "date": "2026-11-04",
+          "status": "service",
+          "choices": [
+            {
+              "name": "Macaroni & Cheese",
+              "vegetarian": true
+            },
+            {
+              "name": "Chicken Corn Dog",
+              "vegetarian": false
+            },
+            {
+              "name": "Chicken Caesar Salad & Crackers",
+              "vegetarian": false
+            }
+          ]
+        },
+        {
+          "date": "2026-11-05",
+          "status": "service",
+          "choices": [
+            {
+              "name": "Teriyaki Chicken Dumplings with Veggie Fried Rice",
+              "vegetarian": false
+            },
+            {
+              "name": "Cheese Enchiladas in Chile Verde Sauce",
+              "vegetarian": true
+            },
+            {
+              "name": "Chicken Bruschetta Sandwich",
+              "vegetarian": false
+            }
+          ]
+        },
+        {
+          "date": "2026-11-06",
+          "status": "service",
+          "choices": [
+            {
+              "name": "Cheese Pizza Wedge",
               "vegetarian": true
             },
             {
@@ -930,37 +998,7 @@
           ]
         },
         {
-          "date": "2026-10-02",
-          "status": "no-school",
-          "choices": []
-        },
-        {
-          "date": "2026-10-05",
-          "status": "no-school",
-          "choices": []
-        },
-        {
-          "date": "2026-10-06",
-          "status": "no-school",
-          "choices": []
-        },
-        {
-          "date": "2026-10-07",
-          "status": "no-school",
-          "choices": []
-        },
-        {
-          "date": "2026-10-08",
-          "status": "no-school",
-          "choices": []
-        },
-        {
-          "date": "2026-10-09",
-          "status": "no-school",
-          "choices": []
-        },
-        {
-          "date": "2026-10-12",
+          "date": "2026-11-09",
           "status": "service",
           "choices": [
             {
@@ -974,7 +1012,7 @@
           ]
         },
         {
-          "date": "2026-10-13",
+          "date": "2026-11-10",
           "status": "service",
           "choices": [
             {
@@ -982,7 +1020,7 @@
               "vegetarian": true
             },
             {
-              "name": "Tinga Chicken Rice Bowl",
+              "name": "NEW - Beef Chili with Chips",
               "vegetarian": false
             },
             {
@@ -996,25 +1034,12 @@
           ]
         },
         {
-          "date": "2026-10-14",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Chicken Burger with French Fries",
-              "vegetarian": false
-            },
-            {
-              "name": "Vegetarian Florentine Pasta",
-              "vegetarian": true
-            },
-            {
-              "name": "Southwest Chicken Fiesta Salad",
-              "vegetarian": false
-            }
-          ]
+          "date": "2026-11-11",
+          "status": "no-school",
+          "choices": []
         },
         {
-          "date": "2026-10-15",
+          "date": "2026-11-12",
           "status": "service",
           "choices": [
             {
@@ -1032,11 +1057,11 @@
           ]
         },
         {
-          "date": "2026-10-16",
+          "date": "2026-11-13",
           "status": "service",
           "choices": [
             {
-              "name": "Cheese Pizza Round",
+              "name": "Cheese Pizza Wedge",
               "vegetarian": true
             },
             {
@@ -1046,7 +1071,7 @@
           ]
         },
         {
-          "date": "2026-10-19",
+          "date": "2026-11-16",
           "status": "service",
           "choices": [
             {
@@ -1060,7 +1085,7 @@
           ]
         },
         {
-          "date": "2026-10-20",
+          "date": "2026-11-17",
           "status": "service",
           "choices": [
             {
@@ -1068,7 +1093,7 @@
               "vegetarian": false
             },
             {
-              "name": "NEW - Creamy Tomato Curry Tortellini with Garlic Toast",
+              "name": "Creamy Tomato Curry Tortellini with Garlic Toast",
               "vegetarian": true
             },
             {
@@ -1078,38 +1103,38 @@
           ]
         },
         {
-          "date": "2026-10-21",
+          "date": "2026-11-18",
           "status": "service",
           "choices": [
             {
-              "name": "Beef Bulgogi Rice Bowl",
+              "name": "NEW - Teriyaki Chicken Rice Bowl with Broccoli",
               "vegetarian": false
             },
             {
-              "name": "Bean & Cheese Quesadilla",
+              "name": "Grilled Cheese",
+              "vegetarian": true
+            },
+            {
+              "name": "Hummus Pack: Hummus, Cucumber, Pita Chips",
               "vegetarian": true
             },
             {
               "name": "Chicken Caesar Salad & Crackers",
               "vegetarian": false
-            },
-            {
-              "name": "Hummus Pack: Hummus, Cucumber, Pita Chips",
-              "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-22",
+          "date": "2026-11-19",
           "status": "service",
           "choices": [
             {
-              "name": "Macaroni & Cheese",
-              "vegetarian": true
+              "name": "Holiday Meal-Turkey in Gravy, Mash Potatoes and a Biscuit",
+              "vegetarian": false
             },
             {
-              "name": "Chicken Corn Dog",
-              "vegetarian": false
+              "name": "Bean, Cheese & Rice Burrito",
+              "vegetarian": true
             },
             {
               "name": "Breaded Spicy Chicken Salad with Ranch Dressing",
@@ -1118,11 +1143,11 @@
           ]
         },
         {
-          "date": "2026-10-23",
+          "date": "2026-11-20",
           "status": "service",
           "choices": [
             {
-              "name": "Cheese Pizza Round",
+              "name": "Cheese Pizza Wedge",
               "vegetarian": true
             },
             {
@@ -1132,80 +1157,41 @@
           ]
         },
         {
-          "date": "2026-10-26",
+          "date": "2026-11-23",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-11-24",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-11-25",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-11-26",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-11-27",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-11-30",
           "status": "service",
           "choices": [
             {
-              "name": "Chicken Tikka Masala w/Rice & Naan Bread",
+              "name": "Beef Hot Dog",
               "vegetarian": false
             },
             {
               "name": "Veggie Burger & Fries",
               "vegetarian": true
-            }
-          ]
-        },
-        {
-          "date": "2026-10-27",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Beef Taquitos with Salsa",
-              "vegetarian": false
-            },
-            {
-              "name": "Bean, Cheese & Rice Burrito",
-              "vegetarian": true
-            },
-            {
-              "name": "Turkey Bacon Club Sandwich",
-              "vegetarian": false
-            }
-          ]
-        },
-        {
-          "date": "2026-10-28",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Orange Chicken with Vegetable Fried Rice",
-              "vegetarian": false
-            },
-            {
-              "name": "Tofu Teriyaki & Broccoli Rice Bowl",
-              "vegetarian": true
-            },
-            {
-              "name": "Southwest Chicken Fiesta Salad",
-              "vegetarian": false
-            }
-          ]
-        },
-        {
-          "date": "2026-10-29",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Chicken Alfredo Pasta",
-              "vegetarian": false
-            },
-            {
-              "name": "Veggie Nuggets, French Fries & Crackers",
-              "vegetarian": true
-            }
-          ]
-        },
-        {
-          "date": "2026-10-30",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Cheese Pizza Round",
-              "vegetarian": true
-            },
-            {
-              "name": "Turkey Pepperoni Pizza",
-              "vegetarian": false
             }
           ]
         }
