@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-21T18:07:38.131Z",
+  "updatedAt": "2026-10-22T18:02:24.686Z",
   "defaultProgram": "elementary-standard",
   "programs": {
     "elementary-standard": {
@@ -1160,84 +1160,69 @@
     "preschool": {
       "schemaVersion": 1,
       "menuType": "preschool",
-      "month": "2026-10",
-      "title": "Preschool Lunch Menu",
-      "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/october-preschool-menussss",
-      "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1790618028/smfcsdnet/f5gtqk9qzuqjgnkgpn9n/OCTOBERPRESCHOOLLUNCHMENU.png",
-      "sourceImagePath": "menu-sources/preschool-2026-10.jpg",
-      "sourceSha256": "439764217aacef90638fcad8d774f528acb93a5695e6dd1027e186cde8bd60c1",
-      "checkedAt": "2026-09-29T06:02:18.836Z",
+      "month": "2026-11",
+      "title": "San Mateo-Foster City School District Preschool Lunch Menu",
+      "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/november-preschool-menusss",
+      "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1792679952/smfcsdnet/jdddaz3p2m3zvbhkmeqn/NOVPREKLUNCHMENU.png",
+      "sourceImagePath": "menu-sources/preschool-2026-11.png",
+      "sourceSha256": "c3a2a17f6acd9db44fb7be81a424a571aca4d08d7c76f2ea7afc65671b2b0dde",
+      "checkedAt": "2026-10-22T18:02:24.686Z",
       "automated": true,
       "model": "gemini-3.5-flash-lite",
-      "dailyNote": "Choice of daily hot entree, yogurt pack, or sun butter sandwich pack, fruits and vegetables, choice of nonfat chocolate or 1% white milk",
+      "dailyNote": "Choice of daily hot entree, yogurt pack or sun butter sandwich, fruit, vegetable, choice of nonfat chocolate or 1% white milk",
       "days": [
         {
-          "date": "2026-10-01",
+          "date": "2026-11-02",
           "status": "service",
           "choices": [
             {
-              "name": "Cheese pizza w/ side salad",
-              "vegetarian": true
-            }
-          ]
-        },
-        {
-          "date": "2026-10-02",
-          "status": "no-school",
-          "choices": []
-        },
-        {
-          "date": "2026-10-05",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Beef hot dog w/ side salad",
+              "name": "Beef hot dog w/side salad",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-06",
+          "date": "2026-11-03",
           "status": "service",
           "choices": [
             {
-              "name": "Grilled cheese sandwich w/side salad",
-              "vegetarian": true
-            }
-          ]
-        },
-        {
-          "date": "2026-10-07",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Beef ragu with penne pasta w/carrots",
+              "name": "Cheese bites w/marinara",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-08",
+          "date": "2026-11-04",
           "status": "service",
           "choices": [
             {
-              "name": "Turkey & cheese sandwich w/corn salad",
+              "name": "Macaroni & cheese with carrots",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-09",
+          "date": "2026-11-05",
           "status": "service",
           "choices": [
             {
-              "name": "Cheese pizza w/ side salad",
-              "vegetarian": true
+              "name": "Teriyaki chicken dumplings w/ veggie fried rice",
+              "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-12",
+          "date": "2026-11-06",
+          "status": "service",
+          "choices": [
+            {
+              "name": "Cheese pizza with side salad",
+              "vegetarian": false
+            }
+          ]
+        },
+        {
+          "date": "2026-11-09",
           "status": "service",
           "choices": [
             {
@@ -1247,142 +1232,132 @@
           ]
         },
         {
-          "date": "2026-10-13",
+          "date": "2026-11-10",
           "status": "service",
           "choices": [
             {
-              "name": "Cheese breadstick & marinara sauce",
-              "vegetarian": true
-            }
-          ]
-        },
-        {
-          "date": "2026-10-14",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Chicken burger w/french fries",
+              "name": "Cheese breadsticks & marinara sauce",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-15",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Bean & cheese pupusa with corn",
-              "vegetarian": true
-            }
-          ]
+          "date": "2026-11-11",
+          "status": "no-school",
+          "choices": []
         },
         {
-          "date": "2026-10-16",
+          "date": "2026-11-12",
           "status": "service",
           "choices": [
             {
-              "name": "Cheese pizza w/ side salad",
-              "vegetarian": true
-            }
-          ]
-        },
-        {
-          "date": "2026-10-19",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Beef cheeseburger sliders w/ side salad",
+              "name": "Bean & cheese pupusa w/curtido",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-20",
+          "date": "2026-11-13",
           "status": "service",
           "choices": [
             {
-              "name": "Chicken nuggets w/ french fries",
+              "name": "Cheese pizza with side salad",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-21",
+          "date": "2026-11-16",
           "status": "service",
           "choices": [
             {
-              "name": "Beef bulgogi rice bowl",
+              "name": "Beef cheeseburger sliders with side salad",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-22",
+          "date": "2026-11-17",
           "status": "service",
           "choices": [
             {
-              "name": "Macaroni & cheese w/ corn",
-              "vegetarian": true
-            }
-          ]
-        },
-        {
-          "date": "2026-10-23",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Cheese pizza w/ side salad",
-              "vegetarian": true
-            }
-          ]
-        },
-        {
-          "date": "2026-10-26",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Chicken tikka masala w/ rice, naan bread & side salad",
+              "name": "Chicken nuggets w/ fries",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-27",
+          "date": "2026-11-18",
           "status": "service",
           "choices": [
             {
-              "name": "Beef taquitos w/ salsa",
+              "name": "Teriyaki chicken rice bowl with broccoli",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-28",
+          "date": "2026-11-19",
           "status": "service",
           "choices": [
             {
-              "name": "Orange chickem w/vegetable fried rice",
+              "name": "Thanksgiving meal turkey in gravy, mash potato & a bisquit",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-29",
+          "date": "2026-11-20",
           "status": "service",
           "choices": [
             {
-              "name": "Chicken alfredo pasta w/ corn",
+              "name": "Cheese pizza with side salad",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-10-30",
+          "date": "2026-11-23",
           "status": "service",
           "choices": [
             {
-              "name": "Cheese pizza w/ side salad",
-              "vegetarian": true
+              "name": "Chicken tikka masala, rice, naan bread & side salad",
+              "vegetarian": false
+            }
+          ]
+        },
+        {
+          "date": "2026-11-24",
+          "status": "service",
+          "choices": [
+            {
+              "name": "Beef taquitos with salsa",
+              "vegetarian": false
+            }
+          ]
+        },
+        {
+          "date": "2026-11-25",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-11-26",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-11-27",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-11-30",
+          "status": "service",
+          "choices": [
+            {
+              "name": "Beef hot dog w/side salad",
+              "vegetarian": false
             }
           ]
         }
