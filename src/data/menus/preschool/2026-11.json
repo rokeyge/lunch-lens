@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "menuType": "preschool",
   "month": "2026-11",
-  "title": "San Mateo-Foster City School District Preschool Lunch Menu",
+  "title": "Preschool Lunch Menu",
   "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/november-preschool-menusss",
-  "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1792679952/smfcsdnet/jdddaz3p2m3zvbhkmeqn/NOVPREKLUNCHMENU.png",
+  "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1793033822/smfcsdnet/jlydc4g2ommydnmwlg3s/NOVEMBERPRESCHOOLLUNCH.png",
   "sourceImagePath": "menu-sources/preschool-2026-11.png",
-  "sourceSha256": "c3a2a17f6acd9db44fb7be81a424a571aca4d08d7c76f2ea7afc65671b2b0dde",
-  "checkedAt": "2026-10-22T18:02:24.686Z",
+  "sourceSha256": "503a9afe59cc9aadff6953a1937bdb1d3dc0e93e0860c8f5e64641d7d3636ce5",
+  "checkedAt": "2026-10-28T18:54:44.270Z",
   "automated": true,
   "model": "gemini-3.5-flash-lite",
   "dailyNote": "Choice of daily hot entree, yogurt pack or sun butter sandwich, fruit, vegetable, choice of nonfat chocolate or 1% white milk",
@@ -28,7 +28,7 @@
       "choices": [
         {
           "name": "Cheese bites w/marinara",
-          "vegetarian": false
+          "vegetarian": true
         }
       ]
     },
@@ -38,7 +38,7 @@
       "choices": [
         {
           "name": "Macaroni & cheese with carrots",
-          "vegetarian": false
+          "vegetarian": true
         }
       ]
     },
@@ -58,7 +58,7 @@
       "choices": [
         {
           "name": "Cheese pizza with side salad",
-          "vegetarian": false
+          "vegetarian": true
         }
       ]
     },
@@ -78,7 +78,7 @@
       "choices": [
         {
           "name": "Cheese breadsticks & marinara sauce",
-          "vegetarian": false
+          "vegetarian": true
         }
       ]
     },
@@ -93,7 +93,7 @@
       "choices": [
         {
           "name": "Bean & cheese pupusa w/curtido",
-          "vegetarian": false
+          "vegetarian": true
         }
       ]
     },
@@ -103,7 +103,7 @@
       "choices": [
         {
           "name": "Cheese pizza with side salad",
-          "vegetarian": false
+          "vegetarian": true
         }
       ]
     },
@@ -153,7 +153,7 @@
       "choices": [
         {
           "name": "Cheese pizza with side salad",
-          "vegetarian": false
+          "vegetarian": true
         }
       ]
     },
@@ -179,8 +179,13 @@
     },
     {
       "date": "2026-11-25",
-      "status": "no-school",
-      "choices": []
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken corn dog with corn salad",
+          "vegetarian": false
+        }
+      ]
     },
     {
       "date": "2026-11-26",
