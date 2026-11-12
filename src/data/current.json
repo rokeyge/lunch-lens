@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-11T20:19:57.716Z",
+  "updatedAt": "2026-11-12T20:57:33.639Z",
   "defaultProgram": "elementary-standard",
   "programs": {
     "elementary-standard": {
@@ -827,37 +827,23 @@
     "middle-special-6-8": {
       "schemaVersion": 1,
       "menuType": "middle-special-6-8",
-      "month": "2026-11",
-      "title": "November 2026 6th-8th Menu San Mateo Foster-City SD - Parkside, Fiesta Gardens, North Shoreview",
-      "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/november-6-8-menus-parkside-fiesta-gardens-north-shoreview",
-      "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1792433596/smfcsdnet/eiywbgw9bifkpnusvvnw/NOV6-8LUNCH_1.png",
-      "sourceImagePath": "menu-sources/middle-special-6-8-2026-11.png",
-      "sourceSha256": "96828a004773507dedb6b189c8c210c16915b4f4ae8972313eb1e0c539a390d8",
-      "checkedAt": "2026-10-19T19:23:58.710Z",
+      "month": "2026-12",
+      "title": "December 2026 6th-8th Menu San Mateo Foster-City SD - Parkside, Fiesta Gardens, North Shoreview",
+      "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/december-6-8-menus",
+      "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1794266014/smfcsdnet/cqamlahut5n6chmniskr/DEC6-8LUNCHMENU.png",
+      "sourceImagePath": "menu-sources/middle-special-6-8-2026-12.png",
+      "sourceSha256": "7ad5030e50d000e67e5e3a6d92c7ec7ee2e3b6154563843313b4d0d0e58d8cf8",
+      "checkedAt": "2026-11-12T20:57:33.639Z",
       "automated": true,
-      "model": "gemini-3.6-flash, gemini-3.5-flash-lite",
-      "dailyNote": "Items Available Daily: Choice of Daily Entree, Yogurt Pack, Wowbutter Pack, Fruit, Vegetables, Nonfat Chocolate or 1% White Milk (V) = Vegetarian Meal",
+      "model": "gemini-3.5-flash-lite",
+      "dailyNote": "Items Available Daily: Choice of Daily Entree, Yogurt Pack, Wowbutter Pack, Fruit, Vegetables, Nonfat Chocolate or 1% White Milk. (V) = Vegetarian Meal",
       "days": [
         {
-          "date": "2026-11-02",
+          "date": "2026-12-01",
           "status": "service",
           "choices": [
             {
-              "name": "Beef Hot Dog",
-              "vegetarian": false
-            },
-            {
-              "name": "Veggie Burger & Fries",
-              "vegetarian": true
-            }
-          ]
-        },
-        {
-          "date": "2026-11-03",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Chicken Adobo, Potatoes and Rice",
+              "name": "BBQ Chicken Meatballs, Mash Potato & Texas Toast",
               "vegetarian": false
             },
             {
@@ -871,7 +857,7 @@
           ]
         },
         {
-          "date": "2026-11-04",
+          "date": "2026-12-02",
           "status": "service",
           "choices": [
             {
@@ -889,7 +875,7 @@
           ]
         },
         {
-          "date": "2026-11-05",
+          "date": "2026-12-03",
           "status": "service",
           "choices": [
             {
@@ -907,7 +893,7 @@
           ]
         },
         {
-          "date": "2026-11-06",
+          "date": "2026-12-04",
           "status": "service",
           "choices": [
             {
@@ -915,13 +901,13 @@
               "vegetarian": true
             },
             {
-              "name": "Turkey Pepperoni Pizza",
+              "name": "Pepperoni Pizza Wedge",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-11-09",
+          "date": "2026-12-07",
           "status": "service",
           "choices": [
             {
@@ -935,7 +921,7 @@
           ]
         },
         {
-          "date": "2026-11-10",
+          "date": "2026-12-08",
           "status": "service",
           "choices": [
             {
@@ -943,7 +929,7 @@
               "vegetarian": true
             },
             {
-              "name": "NEW - Beef Chili with Chips",
+              "name": "Beef Chili with Chips",
               "vegetarian": false
             },
             {
@@ -957,16 +943,29 @@
           ]
         },
         {
-          "date": "2026-11-11",
-          "status": "no-school",
-          "choices": []
-        },
-        {
-          "date": "2026-11-12",
+          "date": "2026-12-09",
           "status": "service",
           "choices": [
             {
-              "name": "Pollo Loco Drumstick, Cilantro Rice & Corn",
+              "name": "Crispy Chicken Sandwich w/spicy Signature Sauce and Garnish",
+              "vegetarian": false
+            },
+            {
+              "name": "Vegetarian Florentine Pasta",
+              "vegetarian": true
+            },
+            {
+              "name": "Southwest Chicken Fiesta Salad",
+              "vegetarian": false
+            }
+          ]
+        },
+        {
+          "date": "2026-12-10",
+          "status": "service",
+          "choices": [
+            {
+              "name": "Greek Lemon Pepper Drumstick, Potato Medley and Garlic Quinoa",
               "vegetarian": false
             },
             {
@@ -980,7 +979,7 @@
           ]
         },
         {
-          "date": "2026-11-13",
+          "date": "2026-12-11",
           "status": "service",
           "choices": [
             {
@@ -988,13 +987,13 @@
               "vegetarian": true
             },
             {
-              "name": "Turkey Pepperoni Pizza",
+              "name": "Pepperoni Pizza Wedge",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-11-16",
+          "date": "2026-12-14",
           "status": "service",
           "choices": [
             {
@@ -1008,7 +1007,7 @@
           ]
         },
         {
-          "date": "2026-11-17",
+          "date": "2026-12-15",
           "status": "service",
           "choices": [
             {
@@ -1020,53 +1019,13 @@
               "vegetarian": true
             },
             {
-              "name": "Beef Philly Cheese Sandwich",
+              "name": "Chicken Pesto with Pepperjack Cheese Sandwich",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-11-18",
-          "status": "service",
-          "choices": [
-            {
-              "name": "NEW - Teriyaki Chicken Rice Bowl with Broccoli",
-              "vegetarian": false
-            },
-            {
-              "name": "Grilled Cheese",
-              "vegetarian": true
-            },
-            {
-              "name": "Hummus Pack: Hummus, Cucumber, Pita Chips",
-              "vegetarian": true
-            },
-            {
-              "name": "Chicken Caesar Salad & Crackers",
-              "vegetarian": false
-            }
-          ]
-        },
-        {
-          "date": "2026-11-19",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Holiday Meal-Turkey in Gravy, Mash Potatoes and a Biscuit",
-              "vegetarian": false
-            },
-            {
-              "name": "Bean, Cheese & Rice Burrito",
-              "vegetarian": true
-            },
-            {
-              "name": "Breaded Spicy Chicken Salad with Ranch Dressing",
-              "vegetarian": false
-            }
-          ]
-        },
-        {
-          "date": "2026-11-20",
+          "date": "2026-12-16",
           "status": "service",
           "choices": [
             {
@@ -1074,49 +1033,65 @@
               "vegetarian": true
             },
             {
-              "name": "Turkey Pepperoni Pizza",
+              "name": "Pepperoni Pizza Wedge",
               "vegetarian": false
             }
           ]
         },
         {
-          "date": "2026-11-23",
+          "date": "2026-12-17",
           "status": "no-school",
           "choices": []
         },
         {
-          "date": "2026-11-24",
+          "date": "2026-12-18",
           "status": "no-school",
           "choices": []
         },
         {
-          "date": "2026-11-25",
+          "date": "2026-12-21",
           "status": "no-school",
           "choices": []
         },
         {
-          "date": "2026-11-26",
+          "date": "2026-12-22",
           "status": "no-school",
           "choices": []
         },
         {
-          "date": "2026-11-27",
+          "date": "2026-12-23",
           "status": "no-school",
           "choices": []
         },
         {
-          "date": "2026-11-30",
-          "status": "service",
-          "choices": [
-            {
-              "name": "Beef Hot Dog",
-              "vegetarian": false
-            },
-            {
-              "name": "Veggie Burger & Fries",
-              "vegetarian": true
-            }
-          ]
+          "date": "2026-12-24",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-12-25",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-12-28",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-12-29",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-12-30",
+          "status": "no-school",
+          "choices": []
+        },
+        {
+          "date": "2026-12-31",
+          "status": "no-school",
+          "choices": []
         }
       ]
     },
