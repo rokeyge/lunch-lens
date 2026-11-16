@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "menuType": "elementary-standard",
+  "month": "2026-12",
+  "title": "San Mateo-Foster City School District Elementary Lunch Menu",
+  "sourcePageUrl": "https://www.smfcsd.net/our-district/communication/news/default-board-post-page/~board/district-menu/post/december-bayside-elementary-school-menus",
+  "sourceImageUrl": "https://resources.finalsite.net/images/f_auto,q_auto/v1794264911/smfcsdnet/akaxuix8mfyznyphphyi/DECELEMENTARYLUNCH.png",
+  "sourceImagePath": "menu-sources/elementary-standard-2026-12.jpg",
+  "sourceSha256": "e7d94129e8ce1468068e989bf8c91b5476db061c78571495763e19233c77bcfd",
+  "checkedAt": "2026-11-16T22:56:03.092Z",
+  "automated": true,
+  "model": "gemini-3.6-flash",
+  "dailyNote": "ITEMS AVAILABLE DAILY: -CHOICE OF DAILY HOT ENTREE, YOGURT PACK OR SUN BUTTER SANDWICH, FRUIT, VEGETABLE,CHOICE OF NONFAT CHOCOLATE OR 1% WHITE MILK",
+  "days": [
+    {
+      "date": "2026-12-01",
+      "status": "service",
+      "choices": [
+        {
+          "name": "BBQ Chicken Meatballs w/ Mashed Potatoes & Texas Toast",
+          "vegetarian": false
+        },
+        {
+          "name": "Cheese Bites w/ Marinara Sauce",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-12-02",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Macaroni & Cheeese Pasta",
+          "vegetarian": true
+        },
+        {
+          "name": "Chicken Corn Dog",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-12-03",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Teriyaki Chicken Dumplings w/ Veggie Fried Rice",
+          "vegetarian": false
+        },
+        {
+          "name": "Cheese Enchiladas in Chili Verde Sauce",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-12-04",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese Pizza Round",
+          "vegetarian": true
+        },
+        {
+          "name": "Turkey Pepperoni Pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-12-07",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Turkey Nachos & Tortilla Chips",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie Burger w/ French Fries",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-12-08",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese Breadstick w/ Marinara Sauce",
+          "vegetarian": true
+        },
+        {
+          "name": "Beef Chili w/Chips",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-12-09",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken Burger w/ French Fries",
+          "vegetarian": false
+        },
+        {
+          "name": "Vegetarian Floentine Pasta",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-12-10",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Greek Lemon Pepper Drumstick, Potato Medley and Garlic Quinoa",
+          "vegetarian": false
+        },
+        {
+          "name": "Bean, Rice & Cheese Pupusa w/ Curtido",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-12-11",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese Pizza Round",
+          "vegetarian": true
+        },
+        {
+          "name": "Turkey Pepperoni Pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-12-14",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Beef Cheeseburger Sliders",
+          "vegetarian": false
+        },
+        {
+          "name": "Veggie Burger w/ French Fries",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-12-15",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Chicken Nuggets w/ French Fries",
+          "vegetarian": false
+        },
+        {
+          "name": "Creamy Tomato Curry Tortellini w/Garlic Toast",
+          "vegetarian": true
+        }
+      ]
+    },
+    {
+      "date": "2026-12-16",
+      "status": "service",
+      "choices": [
+        {
+          "name": "Cheese Pizza Round",
+          "vegetarian": true
+        },
+        {
+          "name": "Turkey Pepperoni Pizza",
+          "vegetarian": false
+        }
+      ]
+    },
+    {
+      "date": "2026-12-17",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-18",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-21",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-22",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-23",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-24",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-25",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-28",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-29",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-30",
+      "status": "no-school",
+      "choices": []
+    },
+    {
+      "date": "2026-12-31",
+      "status": "no-school",
+      "choices": []
+    }
+  ]
+}
